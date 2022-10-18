@@ -1,0 +1,16 @@
+body {
+    font-family: sans-serif;
+    padding: 1rem 4rem;
+}
+
+li { padding-top: 4px; }
+
+a:link, a:visited {
+    color: #00248F;
+    text-decoration: none;
+}
+
+:link:hover,:visited:hover {
+    color: #B32400;
+    text-decoration: underline;
+}

@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Upload</title>
+    <link rel="stylesheet" href="static/css/site.css" />
 </head>
 
 <body>
@@ -18,9 +19,9 @@
     {% if files %}
         <p>Files already uploaded:</p>
         <ul>
-        {% for file in files %}
-            <li><code>{{ file }}</code></li>
-        {% endfor %}
+            {% for file in files %}
+                <li><code>{{ file }}</code></li>
+            {% endfor %}
         </ul>
     {% endif %}
 </body>
