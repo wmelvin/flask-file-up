@@ -17,7 +17,7 @@ app.config["UPLOAD_PATH"] = "uploads"
 
 @app.route('/')
 def index():
-    files = os.listdir(app.config["UPLOAD_PATH"])
+    files = sorted(os.listdir(app.config["UPLOAD_PATH"]))
     return render_template("index.html", files=files)
 
 

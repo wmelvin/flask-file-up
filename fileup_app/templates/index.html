@@ -15,9 +15,14 @@
         <p><input type="submit" value="Submit"></p>
     </form>
     <hr>
-    {% for file in files %}
-        <p>{{ file }}</p>
-    {% endfor %}
+    {% if files %}
+        <p>Files already uploaded:</p>
+        <ul>
+        {% for file in files %}
+            <li><code>{{ file }}</code></li>
+        {% endfor %}
+        </ul>
+    {% endif %}
 </body>
 
 </html>
