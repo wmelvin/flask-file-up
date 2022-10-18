@@ -5,8 +5,12 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Upload</title>
+
+    <title>{% block title_text %}{% endblock %}</title>
+
     <link rel="stylesheet" href="static/css/site.css" />
+
+    {% block add_css %}{% endblock %}
 </head>
 
 <body>
@@ -14,11 +18,12 @@
         <a href="/">Home</a>
         <a href="/upload">Upload</a>
     </nav>
+
     <div id="main_content">
-    {% block main_content %}
-    
-    {% endblock main_content %}
+    {% block main_content %}{% endblock main_content %}
     </div>
+
+    {% block add_js %}{% endblock %}
 </body>
 
 </html>
