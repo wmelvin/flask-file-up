@@ -13,18 +13,18 @@ Added settings to the `.vscode/settings.json` file for the project (not in repo)
 The `python.formatting.blackArgs` setting in this fragment overrides some of the **black** formatter's defaults:
 
 ```json
-    "python.formatting.provider": "black",
-    "python.formatting.blackArgs": [
-        "--skip-string-normalization",
-        "--line-length",
-        "79"
-    ],
+"python.formatting.provider": "black",
+"python.formatting.blackArgs": [
+    "--skip-string-normalization",
+    "--line-length",
+    "79"
+],
 ```
 
 This fragment tells **Better Jinja** to treat HTML files as Jinja2 templates:
 
 ```json
-    "files.associations": {
-        "*.html": "jinja-html"
-      }
+"files.associations": {
+    "*.html": "jinja-html"
+}
 ```
