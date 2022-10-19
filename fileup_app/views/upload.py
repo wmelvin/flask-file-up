@@ -32,4 +32,4 @@ def upload_files():
             up_file.save(
                 os.path.join(current_app.config["UPLOAD_PATH"], file_name)
             )
-    return redirect(url_for("upload"))
+    return redirect(url_for(".upload"))
