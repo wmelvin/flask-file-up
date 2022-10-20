@@ -11,7 +11,7 @@ class UploadedFile(db.Model):
     file_name = db.Column(db.String(255), nullable=False)
 
     when_uploaded = db.Column(
-        db.DateTime, nullable=False, default=datetime.now()
+        db.DateTime, nullable=False, default=datetime.now
     )
 
     def __repr__(self) -> str:
