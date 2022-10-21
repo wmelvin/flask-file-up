@@ -10,7 +10,11 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
-    db_file = os.path.join(basedir, 'fileup.sqlite')
+
+    db_dir = os.path.join(os.path.dirname(basedir), 'local_db')
+    db_file = os.path.join(db_dir, 'fileup.sqlite')
+    # TODO: Prod db settings.
+
     app.config.from_mapping(
         #  Configuration for database.
         SQLALCHEMY_DATABASE_URI=f"sqlite:///{db_file}",
