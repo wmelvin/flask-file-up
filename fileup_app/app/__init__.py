@@ -11,8 +11,8 @@ db = SQLAlchemy()
 def create_app():
     app = Flask(__name__)
 
-    db_dir = os.path.join(os.path.dirname(basedir), 'local_db')
-    db_file = os.path.join(db_dir, 'fileup.sqlite')
+    db_dir = os.path.join(os.path.dirname(basedir), "local_db")
+    db_file = os.path.join(db_dir, "fileup.sqlite")
     # TODO: Prod db settings.
 
     app.config.from_mapping(

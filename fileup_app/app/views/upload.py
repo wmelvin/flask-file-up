@@ -12,10 +12,10 @@ from flask import (
 from werkzeug.utils import secure_filename
 
 
-blueprint = Blueprint('upload', __name__, template_folder="templates")
+blueprint = Blueprint("upload", __name__, template_folder="templates")
 
 
-@blueprint.route('/upload')
+@blueprint.route("/upload")
 def upload():
     files = sorted(os.listdir(current_app.config["UPLOAD_PATH"]))
     return render_template("upload.html", files=files)
