@@ -40,3 +40,6 @@ def create_app():
     app.register_blueprint(upload.blueprint)
 
     return app
+
+
+from app import models  # noqa

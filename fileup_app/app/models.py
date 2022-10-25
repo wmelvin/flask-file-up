@@ -7,7 +7,7 @@ class Org(db.Model):
     __tablename__ = "orgs"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    orgname = db.Column(db.String(64), nullable=False, unique=True)
+    org_name = db.Column(db.String(64), nullable=False, unique=True)
     when_added = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
     def __repr__(self) -> str:
