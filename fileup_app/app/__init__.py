@@ -2,10 +2,12 @@ import os
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 db = SQLAlchemy()
+migrate = Migrate()
 
 
 def create_app():
@@ -13,6 +15,7 @@ def create_app():
 
     db_dir = os.path.join(os.path.dirname(basedir), "local_db")
     db_file = os.path.join(db_dir, "fileup.sqlite")
+
     # TODO: Prod db settings.
 
     app.config.from_mapping(
@@ -26,6 +29,7 @@ def create_app():
     )
 
     db.init_app(app)
+    migrate.init_app(app, db)
 
     from app.views import account
     from app.views import home

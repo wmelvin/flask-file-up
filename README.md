@@ -19,6 +19,25 @@ Use [flask.current_app](https://flask.palletsprojects.com/en/latest/api/#flask.c
 - [Column INSERT/UPDATE Defaults](https://docs.sqlalchemy.org/en/14/core/defaults.html)
 - [The Type Hierarchy](https://docs.sqlalchemy.org/en/14/core/type_basics.html#the-camelcase-datatypes)
 
+---
+
+[flask-sqlalchemy](https://pypi.org/project/flask-sqlalchemy/) - PyPI
+
+[Flask-SQLAlchemy Documentation](https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/)
+
+[flask-sqlalchemy](https://github.com/pallets-eco/flask-sqlalchemy/) - GitHub
+
+
+[Flask-Migrate](https://pypi.org/project/Flask-Migrate/) - PyPI
+
+[miguelgrinberg/Flask-Migrate](https://github.com/miguelgrinberg/flask-migrate) - GitHub 
+SQLAlchemy database migrations for Flask applications using Alembic.
+
+[alembic](https://pypi.org/project/alembic/) - PyPI
+
+[Alembic documentation](https://alembic.sqlalchemy.org/en/latest/)
+
+
 ## Notes
 
 Using **Visual Studio Code** with the [cornflakes-linter](https://marketplace.visualstudio.com/items?itemName=kevinglasson.cornflakes-linter) and [Better Jinja](https://marketplace.visualstudio.com/items?itemName=samuelcolvin.jinjahtml) extensions.
