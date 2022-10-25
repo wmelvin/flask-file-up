@@ -62,3 +62,9 @@ This fragment tells **Better Jinja** to treat HTML files as Jinja2 templates:
     "*.html": "jinja-html"
 }
 ```
+
+---
+
+Using `pip-compile`, part of [pip-tools](https://pypi.org/project/pip-tools/), to create/update `requirements.txt` from `requirements.in`.
+
+GitHub: [jazzband/pip-tools](https://github.com/jazzband/pip-tools/): A set of tools to keep your pinned Python dependencies fresh.

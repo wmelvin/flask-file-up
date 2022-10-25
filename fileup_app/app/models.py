@@ -11,7 +11,7 @@ class Org(db.Model):
     when_added = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
     def __repr__(self) -> str:
-        return f"<Org {self.id}>"
+        return f"<Org {self.orgname}>"
 
 
 class User(db.Model):
@@ -26,7 +26,7 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, default=False)
 
     def __repr__(self) -> str:
-        return f"<User {self.id}>"
+        return f"<User {self.username}>"
 
 
 class UploadedFile(db.Model):
