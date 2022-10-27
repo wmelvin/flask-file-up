@@ -1,6 +1,8 @@
 from datetime import datetime
 
-from app import db
+from flask_login import UserMixin
+
+from app import db, login_mgr
 
 
 class Org(db.Model):
@@ -14,7 +16,7 @@ class Org(db.Model):
         return f"<Org {self.orgname}>"
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -27,6 +29,11 @@ class User(db.Model):
 
     def __repr__(self) -> str:
         return f"<User {self.username}>"
+
+
+@login_mgr.user_loader
+def load_user(id):
+    User.query.get(int(id))
 
 
 class UploadedFile(db.Model):

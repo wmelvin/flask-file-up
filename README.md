@@ -2,7 +2,7 @@
 
 > This is a work-in-progress demo. If it works out, a LICENSE will be added when it is done. Otherwise this repository will probably go away.
 
-<sub>2022-10-18</sub>
+<sub>Created: 2022-10-18</sub>
 
 ## Links
 
@@ -30,12 +30,27 @@ Use [flask.current_app](https://flask.palletsprojects.com/en/latest/api/#flask.c
 
 [Flask-Migrate](https://pypi.org/project/Flask-Migrate/) - PyPI
 
-[miguelgrinberg/Flask-Migrate](https://github.com/miguelgrinberg/flask-migrate) - GitHub 
-SQLAlchemy database migrations for Flask applications using Alembic.
+[miguelgrinberg/Flask-Migrate](https://github.com/miguelgrinberg/flask-migrate) - GitHub - SQLAlchemy database migrations for Flask applications using Alembic.
 
 [alembic](https://pypi.org/project/alembic/) - PyPI
 
 [Alembic documentation](https://alembic.sqlalchemy.org/en/latest/)
+
+---
+
+[Flask-WTF](https://flask-wtf.readthedocs.io/en/1.0.x/) - Documentation
+
+[Flask-WTF](https://pypi.org/project/Flask-WTF/) - PyPI
+
+[WTForms](https://wtforms.readthedocs.io/en/3.0.x/) - Documentation
+
+---
+
+[Flask-Login](https://flask-login.readthedocs.io/en/latest/) - Documentation
+
+[Flask-Login](https://pypi.org/project/Flask-Login/) - PyPI
+
+[maxcountryman/flask-login](https://github.com/maxcountryman/flask-login) - GitHub - Flask user session management.
 
 
 ## Notes
