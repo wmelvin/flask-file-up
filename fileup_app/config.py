@@ -5,7 +5,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 def local_db_uri() -> str:
-    db_dir = os.path.join(os.path.dirname(basedir), "local_db")
+    db_dir = os.path.join(basedir, "local_db")
     db_file = os.path.join(db_dir, "fileup.sqlite")
     return f"sqlite:///{db_file}"
 

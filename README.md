@@ -52,6 +52,12 @@ Use [flask.current_app](https://flask.palletsprojects.com/en/latest/api/#flask.c
 
 [maxcountryman/flask-login](https://github.com/maxcountryman/flask-login) - GitHub - Flask user session management.
 
+---
+
+Werkzeug Documentation:
+- [generate_password_hash](https://werkzeug.palletsprojects.com/en/2.2.x/utils/#werkzeug.security.generate_password_hash)
+- [check_password_hash](https://werkzeug.palletsprojects.com/en/2.2.x/utils/#werkzeug.security.check_password_hash)
+
 
 ## Notes
 
