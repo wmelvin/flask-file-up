@@ -11,11 +11,17 @@
         {{ form.hidden_tag() }}
         <p>
             {{ form.username.label }}<br>
-            {{ form.username(size=32) }}
+            {{ form.username(size=32) }}<br>
+            {% for err in form.username.errors %}
+            <span class="errmsg"> ({{ err }})</span>
+            {% endfor %}
         </p>
         <p>
             {{ form.password.label }}<br>
-            {{ form.password(size=32) }}
+            {{ form.password(size=32) }}<br>
+            {% for err in form.password.errors %}
+            <span class="errmsg"> ({{ err }})</span>
+            {% endfor %}
         </p>
         <p>{{ form.submit }}</p>
     </form>
