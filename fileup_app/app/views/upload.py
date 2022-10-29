@@ -9,19 +9,22 @@ from flask import (
     abort,
     current_app,
 )
+from flask_login import login_required
 from werkzeug.utils import secure_filename
 
 
-blueprint = Blueprint("upload", __name__, template_folder="templates")
+bp = Blueprint("upload", __name__, template_folder="templates")
 
 
-@blueprint.route("/upload")
+@bp.route("/upload")
+@login_required
 def upload():
     files = sorted(os.listdir(current_app.config["UPLOAD_PATH"]))
     return render_template("upload.html", files=files)
 
 
-@blueprint.route("/upload", methods=["POST"])
+@bp.route("/upload", methods=["POST"])
+@login_required
 def upload_files():
     for up_file in request.files.getlist("file"):
         file_name = secure_filename(up_file.filename)

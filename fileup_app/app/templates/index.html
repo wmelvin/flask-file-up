@@ -3,6 +3,11 @@
 {% block main_content %}
     <h1>File Upload Site</h1>
     <div>
+        {% if current_user.is_anonymous %}
+        <p><a href="/login">Log in to upload files</a></p>
+        {% else %}
         <p><a href="/upload">Upload files</a></p>
+        {% endif %}
     </div>
-{% endblock main_content%}
+
+{% endblock main_content %}
