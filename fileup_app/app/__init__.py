@@ -19,19 +19,11 @@ def create_app(config_class=Config):
 
     db.init_app(app)
     migrate.init_app(app, db)
-    # login_mgr.init_app(app)
-    # login_mgr.login_view = "login.login"
-
-    from app.views import home
-    from app.views import upload
-    from app.views import login
-
-    app.register_blueprint(home.bp)
-    app.register_blueprint(upload.bp)
-    app.register_blueprint(login.bp)
-
     login_mgr.init_app(app)
     login_mgr.login_view = "login.login"
+
+    from app.main import bp as main_bp
+    app.register_blueprint(main_bp)
 
     return app
 
