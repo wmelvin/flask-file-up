@@ -21,11 +21,6 @@ from app.main import bp
 @bp.route("/")
 @bp.route("/index")
 def index():
-    # DEBUG
-    print("index: current_user:")
-    print(f"is_authenticated = {current_user.is_authenticated}")
-    print(f"    is_anonymous = {current_user.is_anonymous}")
-
     return render_template("index.html")
 
 
@@ -43,17 +38,7 @@ def login():
             flash("Invalid user name or password.")
             return redirect(url_for("main.login"))
 
-        # DEBUG
-        print("Before login:")
-        print(f"is_authenticated = {current_user.is_authenticated}")
-        print(f"    is_anonymous = {current_user.is_anonymous}")
-
-        login_user(user)  # TODO: Add remember option.
-
-        # DEBUG
-        print("After login:")
-        print(f"is_authenticated = {current_user.is_authenticated}")
-        print(f"    is_anonymous = {current_user.is_anonymous}")
+        login_user(user, remember=form.remember_me.data)
 
         next_page = request.args.get("next")
         if not next_page or url_parse(next_page).netloc != "":

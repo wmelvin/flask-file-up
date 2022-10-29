@@ -1,9 +1,7 @@
 from datetime import datetime
-
+from app import db, login_mgr
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
-
-from app import db, login_mgr
 
 
 class Org(db.Model):
@@ -26,10 +24,14 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(80), nullable=False, unique=True)
     password_hash = db.Column(db.String(255), nullable=False)
     when_added = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    is_active = db.Column(db.Boolean, default=False)
+    active = db.Column(db.Boolean, default=False)
 
     def __repr__(self) -> str:
-        return f"<User {self.username}>"
+        return f"<User {self.id}: '{self.username}'>"
+
+    @property
+    def is_active(self):
+        return self.active
 
     def set_password(self, password: str):
         self.password_hash = generate_password_hash(password)
@@ -40,7 +42,12 @@ class User(UserMixin, db.Model):
 
 @login_mgr.user_loader
 def load_user(id):
-    User.query.get(int(id))
+    user = User.query.get(int(id))
+
+    # DEBUG
+    print(f"load_user: user = {user}")
+
+    return user
 
 
 class UploadedFile(db.Model):

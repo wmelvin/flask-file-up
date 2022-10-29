@@ -49,7 +49,7 @@ def seed_users(data_path: Path):
                 u.org_id = org.id
                 u.username = str(row["username"])
                 u.email = str(row["email"])
-                u.is_active = True
+                u.active = True
                 u.set_password(str(row["password"]))
                 db.session.add(u)
                 db.session.commit()

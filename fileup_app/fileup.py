@@ -5,8 +5,8 @@ from seed_db import seed_db
 
 app = create_app()
 
-with app.app_context():
-    seed_db()
+# with app.app_context():
+#     seed_db()
 
 
 @app.shell_context_processor

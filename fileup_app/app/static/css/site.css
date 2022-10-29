@@ -39,3 +39,11 @@ nav > a {
 }
 
 .errmsg { color: red; }
+
+.debug-div {
+    display: inline-block;
+    border: 1px solid salmon;
+    color: gray;
+    margin-top: 2rem;
+    padding: 0.5rem;
+}

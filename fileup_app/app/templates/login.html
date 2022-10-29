@@ -23,6 +23,7 @@
             <span class="errmsg"> ({{ err }})</span>
             {% endfor %}
         </p>
+        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
         <p>{{ form.submit }}</p>
     </form>
 
