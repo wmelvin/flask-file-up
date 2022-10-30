@@ -1,0 +1,7 @@
+# Template for the .env file which is excluded from source control.
+
+FILEUP_SECRET_KEY="<str: long-string-of-randomness-goes-here>"
+
+SQLALCHEMY_DATABASE_URI="<str>"
+
+FILEUP_MAX_UPLOAD_MB=<int>

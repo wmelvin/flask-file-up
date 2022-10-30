@@ -1,7 +1,10 @@
 import os
 
+from dotenv import load_dotenv
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basedir, ".env"))
 
 
 def local_db_uri() -> str:
@@ -15,13 +18,22 @@ class Config(object):
     # TODO: Make sure the 'or' case does not make it to prod.
 
     #  Configuration for database.
-    SQLALCHEMY_DATABASE_URI = local_db_uri()
+
+    SQLALCHEMY_DATABASE_URI = (
+        os.environ.get("FILEUP_DATABASE_URI") or local_db_uri()
+    )
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    # TODO: Prod db settings.
 
     #  Configuration for file uploads.
-    MAX_CONTENT_LENGTH = (1024 * 1024)
-    # TODO: 1 MB for now, but needs to be set.
+
+    #  Default is 2MB for max size of uploaded file.
+    s = os.environ.get("FILEUP_MAX_UPLOAD_MB")
+    if s is not None and s.isdigit():
+        max_upload_mb = int(s)
+    else:
+        max_upload_mb = 2
+    MAX_CONTENT_LENGTH = max_upload_mb * 1024 * 1024
 
     UPLOAD_EXTENSIONS = [".csv", ".xls", ".xlsx"]
     UPLOAD_PATH = "uploads"

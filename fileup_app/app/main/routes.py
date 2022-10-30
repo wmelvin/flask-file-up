@@ -59,7 +59,13 @@ def logout():
 @login_required
 def upload():
     files = sorted(os.listdir(current_app.config["UPLOAD_PATH"]))
-    return render_template("upload.html", files=files)
+    a = current_app.config["UPLOAD_EXTENSIONS"]
+    if a:
+        accept = f"accept={','.join(a)}"
+    else:
+        print("No UPLOAD_EXTENSIONS configured. Default to '.csv'.")
+        accept = "accept=.csv"
+    return render_template("upload.html", files=files, accept=accept)
 
 
 @bp.route("/upload", methods=["POST"])
