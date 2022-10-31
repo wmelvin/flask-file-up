@@ -59,13 +59,18 @@ Werkzeug Documentation:
 - [check_password_hash](https://werkzeug.palletsprojects.com/en/2.2.x/utils/#werkzeug.security.check_password_hash)
 
 
+---
+
+ SQLAlchemy 1.4 Documentation: [Microsoft SQL Server](https://docs.sqlalchemy.org/en/14/dialects/mssql.html#module-sqlalchemy.dialects.mssql.pyodbc)
+
+[pyodbc](https://pypi.org/project/pyodbc/) - PyPI
+
+
 ## Notes
 
 Using **Visual Studio Code** with the [cornflakes-linter](https://marketplace.visualstudio.com/items?itemName=kevinglasson.cornflakes-linter) and [Better Jinja](https://marketplace.visualstudio.com/items?itemName=samuelcolvin.jinjahtml) extensions.
 
-Added settings to the `.vscode/settings.json` file for the project (not in repo).
-
-The `python.formatting.blackArgs` setting in this fragment overrides some of the **black** formatter's defaults:
+Added settings to the `.vscode/settings.json` file for the project (not in repo). The `python.formatting.blackArgs` setting in this fragment overrides some of the [black](https://pypi.org/project/black/) formatter's defaults:
 
 ```json
 "python.formatting.provider": "black",
@@ -75,6 +80,8 @@ The `python.formatting.blackArgs` setting in this fragment overrides some of the
     "79"
 ],
 ```
+
+> I ended up removing the `--skip-string-normalization` setting. Even though I would prefer to use single quotes in most cases, because I have been using *black* in other projects, I am now in the habit of using double quotes, but not always. Therefore, I'll just let them be normalized for consistency. *-wem*
 
 This fragment tells **Better Jinja** to treat HTML files as Jinja2 templates:
 

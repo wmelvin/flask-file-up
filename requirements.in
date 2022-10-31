@@ -3,4 +3,5 @@ Flask-Login
 Flask-Migrate
 Flask-SQLAlchemy
 Flask-WTF
+pyodbc
 python-dotenv

@@ -47,6 +47,8 @@ markupsafe==2.1.1
     #   mako
     #   werkzeug
     #   wtforms
+pyodbc==4.0.34
+    # via -r requirements.in
 python-dotenv==0.21.0
     # via -r requirements.in
 sqlalchemy==1.4.42
