@@ -14,8 +14,9 @@ from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 
 from app.main.forms import LoginForm
-from app.models import User
+from app.models import User, Org, UploadedFile
 from app.main import bp
+from app import db
 
 
 @bp.route("/")
@@ -71,6 +72,10 @@ def upload():
 @bp.route("/upload", methods=["POST"])
 @login_required
 def upload_files():
+    user: User = current_user
+    org: Org = Org.query.get(user.org_id)
+    print(f"upload_files: user='{user}', org='{org}'")
+
     for up_file in request.files.getlist("file"):
         file_name = secure_filename(up_file.filename)
         if file_name != "":
@@ -80,4 +85,14 @@ def upload_files():
             up_file.save(
                 os.path.join(current_app.config["UPLOAD_PATH"], file_name)
             )
+            uf: UploadedFile = UploadedFile(
+                file_name,
+                org.id,
+                org.org_name,
+                user.id,
+                user.username,
+            )
+            db.session.add(uf)
+            db.session.commit()
+
     return redirect(url_for("main.upload"))

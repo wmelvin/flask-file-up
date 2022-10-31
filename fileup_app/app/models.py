@@ -12,7 +12,7 @@ class Org(db.Model):
     when_added = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
     def __repr__(self) -> str:
-        return f"<Org {self.orgname}>"
+        return f"<Org {self.id}: '{self.org_name}'>"
 
 
 class User(UserMixin, db.Model):
@@ -56,10 +56,26 @@ class UploadedFile(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     file_name = db.Column(db.String(255), nullable=False)
     org_id = db.Column(db.Integer, db.ForeignKey("orgs.id"), nullable=False)
+    org_name = db.Column(db.String(64), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    user_name = db.Column(db.String(80), nullable=False)
     when_uploaded = db.Column(
         db.DateTime, nullable=False, default=datetime.now
     )
+
+    def __init__(
+        self,
+        file_name: str,
+        org_id: int,
+        org_name: str,
+        user_id: int,
+        user_name: str,
+    ):
+        self.file_name = file_name
+        self.org_id = org_id
+        self.org_name = org_name
+        self.user_id = user_id
+        self.user_name = user_name
 
     def __repr__(self) -> str:
         return f"<UploadedFile {self.id}>"
