@@ -35,4 +35,4 @@ def create_app(config_class=Config):
     return app
 
 
-from app import models  # noqa
+from app import models  # noqa E402

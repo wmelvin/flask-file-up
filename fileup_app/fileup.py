@@ -1,6 +1,9 @@
-from app import create_app, db
+from rich.traceback import install
+install(show_locals=True)
 
-from seed_db import seed_db
+from app import create_app, db  # noqa E402
+
+from seed_db import seed_db  # noqa E402
 
 
 app = create_app()

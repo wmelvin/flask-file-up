@@ -66,6 +66,24 @@ Werkzeug Documentation:
 [pyodbc](https://pypi.org/project/pyodbc/) - PyPI
 
 
+[Install the Microsoft ODBC driver for SQL Server (Linux) - ODBC Driver for SQL Server](https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16#ubuntu18) - Microsoft Learn
+
+
+The first part of the instructions at the above Microsoft Learn link could be skipped because, in the host used for development, the Microsoft sources are already in `/etc/apt/sources.list.d/` from previously installing other MS tooling. Confirmed that by searching:
+
+```bash
+    apt-cache search msodbcsql
+```
+
+    msodbcsql17 - ODBC Driver for Microsoft(R) SQL Server(R)
+    msodbcsql18 - ODBC Driver for Microsoft(R) SQL Server(R)
+
+Installed the *ODBC Driver 18 for SQL Server* version:
+
+```bash
+    sudo apt install msodbcsql18
+```
+
 ## Notes
 
 Using **Visual Studio Code** with the [cornflakes-linter](https://marketplace.visualstudio.com/items?itemName=kevinglasson.cornflakes-linter) and [Better Jinja](https://marketplace.visualstudio.com/items?itemName=samuelcolvin.jinjahtml) extensions.
