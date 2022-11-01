@@ -53,3 +53,10 @@ nav > a {
     margin-top: 2rem;
     padding: 0.5rem;
 }
+
+.purpose-div {
+    display: inline-block;
+    border: 1px solid gray;
+    margin: 0.5rem;
+    padding: 0.25rem;
+}

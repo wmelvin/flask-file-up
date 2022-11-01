@@ -9,6 +9,16 @@
     <h1>Upload Files</h1>
     <form method="post" action="" enctype="multipart/form-data">
         <p><input type="file" name="file" {{ accept }} multiple></p>
+
+        {% if purposes %}
+        <div class="purpose-div">
+            <label>Purpose of File:</label><br>
+            {% for p in purposes %}
+                <label><input type="radio" name="purpose" {{ p[0] }}>{{ p[1] }}</label><br>
+            {% endfor %}
+        </div>
+        {% endif %}        
+
         <p><input type="submit" value="Submit"></p>
     </form>
     <hr>

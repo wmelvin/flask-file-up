@@ -50,6 +50,19 @@ def load_user(id):
     return user
 
 
+class Purpose(db.Model):
+    __tablename__ = "purposes"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(80), nullable=False, unique=True)
+    tag = db.Column(db.String(12), nullable=False, unique=True)
+    description = db.Column(db.String, nullable=True)
+    when_added = db.Column(db.DateTime, nullable=False, default=datetime.now)
+
+    def __repr__(self) -> str:
+        return f"<Purpose {self.id}: '{self.title}'>"
+
+
 class UploadedFile(db.Model):
     __tablename__ = "uploads"
 
@@ -59,6 +72,10 @@ class UploadedFile(db.Model):
     org_name = db.Column(db.String(64), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     user_name = db.Column(db.String(80), nullable=False)
+    purpose_id = db.Column(
+        db.Integer, db.ForeignKey("purposes.id"), nullable=False
+    )
+    purpose_tag = db.Column(db.String(12), nullable=False)
     when_uploaded = db.Column(
         db.DateTime, nullable=False, default=datetime.now
     )
@@ -70,15 +87,19 @@ class UploadedFile(db.Model):
         org_name: str,
         user_id: int,
         user_name: str,
+        purpose_id: int,
+        purpose_tag: str,
     ):
         self.file_name = file_name
         self.org_id = org_id
         self.org_name = org_name
         self.user_id = user_id
         self.user_name = user_name
+        self.purpose_id = purpose_id
+        self.purpose_tag = purpose_tag
 
     def __repr__(self) -> str:
-        return f"<UploadedFile {self.id}>"
+        return f"<UploadedFile {self.id}: '{self.file_name}'>"
 
     # TODO: Only active users should be able to see uploads.
     # The organization owns the uploaded file.
