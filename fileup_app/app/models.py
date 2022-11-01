@@ -62,6 +62,9 @@ class Purpose(db.Model):
     def __repr__(self) -> str:
         return f"<Purpose {self.id}: '{self.title}'>"
 
+    def get_tag(self):
+        return str(self.tag).replace(" ", "_").replace("-", "_")
+
 
 class UploadedFile(db.Model):
     __tablename__ = "uploads"

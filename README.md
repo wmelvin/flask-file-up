@@ -39,10 +39,11 @@ Use [flask.current_app](https://flask.palletsprojects.com/en/latest/api/#flask.c
 ---
 
 [Flask-WTF](https://flask-wtf.readthedocs.io/en/1.0.x/) - Documentation
-
 [Flask-WTF](https://pypi.org/project/Flask-WTF/) - PyPI
 
 [WTForms](https://wtforms.readthedocs.io/en/3.0.x/) - Documentation
+- [Fields / Convenience Fields](https://wtforms.readthedocs.io/en/3.0.x/fields/#convenience-fields)
+- [Validators](https://wtforms.readthedocs.io/en/3.0.x/validators/)
 
 ---
 
