@@ -64,7 +64,7 @@ $sqlServerName = "${baseName}${uniqtag}dbsrv"
 $sqlDatabaseName = "${baseName}${uniqtag}sqldb"
 
 $escpw = [uri]::EscapeDataString($SqlAdminPass)
-$appDatabaseURI = "mssql+pyodbc://${SqlAdminUser}:${escpw}@${slqServerName}.database.windows.net:1433/${sqlDatabaseName}?driver=ODBC+Driver+18+for+SQL+Server"
+$appDatabaseURI = "mssql+pyodbc://${sqlAdminUser}:${escpw}@${sqlServerName}.database.windows.net:1433/${sqlDatabaseName}?driver=ODBC+Driver+18+for+SQL+Server"
 
 
 # ======================================================================
@@ -189,7 +189,7 @@ az webapp config set -g $rgName --name $webAppName --startup-file $startCmd
 # -- Zip deploy (update $zipFile value before running).
 #    https://learn.microsoft.com/en-us/cli/azure/webapp?view=azure-cli-latest#az-webapp-deploy
 #
-# $zipFile = "fileup_20221101_01.zip"
+# $zipFile = "../deploy/fileup_20221102_01.zip"
 # az webapp deploy --name $webAppName -g $rgName --src-path $zipFile
 
 
