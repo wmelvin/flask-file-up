@@ -84,6 +84,14 @@ Installed the *ODBC Driver 18 for SQL Server* version:
 ```bash
     sudo apt install msodbcsql18
 ```
+Note: The Linux containers used to host Azure Webapps have `msodbcsql18` installed. 
+
+---
+
+[Quickstart: Deploy a Python (Django or Flask) web app to Azure](https://learn.microsoft.com/en-us/azure/app-service/quickstart-python?tabs=flask%2Cmac-linux%2Cazure-cli%2Czip-deploy%2Cdeploy-instructions-azcli%2Cterminal-bash%2Cdeploy-instructions-zip-azcli#3---deploy-your-application-code-to-azure) -  Microsoft Learn
+
+[az webapp deploy](https://learn.microsoft.com/en-us/cli/azure/webapp?view=azure-cli-latest#az-webapp-deploy) - Microsoft Learn
+
 
 ## Notes
 

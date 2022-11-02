@@ -63,7 +63,8 @@ $webAppName = "${baseName}${uniqtag}webapp"
 $sqlServerName = "${baseName}${uniqtag}dbsrv"
 $sqlDatabaseName = "${baseName}${uniqtag}sqldb"
 
-$appDatabaseURI = "mssql+pyodbc://${SqlAdminUser}:${SqlAdminPass}@${slqServerName}:1433/${sqlDatabaseName}?driver=ODBC+Driver+18+for+SQL+Server"
+$escpw = [uri]::EscapeDataString($SqlAdminPass)
+$appDatabaseURI = "mssql+pyodbc://${SqlAdminUser}:${escpw}@${slqServerName}.database.windows.net:1433/${sqlDatabaseName}?driver=ODBC+Driver+18+for+SQL+Server"
 
 
 # ======================================================================
@@ -113,21 +114,21 @@ az webapp create `
 # -- Configure for ZIP file deployment.
 #    https://learn.microsoft.com/en-us/azure/app-service/quickstart-python?tabs=flask%2Cwindows%2Cazure-cli%2Czip-deploy%2Cdeploy-instructions-azcli%2Cterminal-bash%2Cdeploy-instructions-zip-azcli#3---deploy-your-application-code-to-azure
 
-Write-Host "`nSTEP - Configuring settings for: $appServiceName`n"
+Write-Host "`nSTEP - Configuring settings for: $webAppName`n"
 
 az webapp config appsettings set `
     -g $rgName `
-    --name $appServiceName `
+    --name $webAppName `
     --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
 
 
 # -- Configure settings for the web app. These are available to the app as environment variables.
 
-Write-Host "`nSTEP - Configuring web app settings for: $appServiceName`n"
+Write-Host "`nSTEP - Configuring web app settings for: $webAppName`n"
 
 az webapp config appsettings set `
     -g $rgName `
-    --name $appServiceName `
+    --name $webAppName `
     --settings "FILEUP_SECRET_KEY=$AppSecretKey" `
     "FILEUP_MAX_UPLOAD_MB=$AppMaxUploadSizeMb" `
     "FILEUP_DATABASE_URI=$AppDatabaseURI"
@@ -170,11 +171,26 @@ Write-Host "`nSTEP - Creating database: $sqlDatabaseName`n"
 az sql db create --name $sqlDatabaseName -g $rgName --server $sqlServerName
 
 
+
+# -- Set custom startup command for running the Flask app.
+#    https://learn.microsoft.com/en-us/azure/app-service/configure-language-python#customize-startup-command
+
+Write-Host "`nSTEP - Configure startup command for: $webAppName`n"
+
+$startCmd = "gunicorn --bind=0.0.0.0 --timeout 600 --chdir fileup_app fileup:app"
+az webapp config set -g $rgName --name $webAppName --startup-file $startCmd
+
+
+
 # ----------------------------------------------------------------------
 # Additional commands and information.
 
-# -- Get the connection string.
-# $connStr = $(az sql db show-connection-string -s $sqlServerName -n $sqlDatabaseName -c ado.net)
+
+# -- Zip deploy (update $zipFile value before running).
+#    https://learn.microsoft.com/en-us/cli/azure/webapp?view=azure-cli-latest#az-webapp-deploy
+#
+# $zipFile = "fileup_20221101_01.zip"
+# az webapp deploy --name $webAppName -g $rgName --src-path $zipFile
 
 
 # -- To add the local IP to the Database Server in the Azure Portal:
@@ -186,9 +202,16 @@ az sql db create --name $sqlDatabaseName -g $rgName --server $sqlServerName
 #    - Click 'Save'.
 
 
+# -- Get the database connection string. The Flask app does not use this.
+#
+# $connStr = $(az sql db show-connection-string -s $sqlServerName -n $sqlDatabaseName -c ado.net)
+
+
 # -- List resources.
+#
 # az resource list -g $rgName -o table
 
 
 # -- Delete the whole lot when done.
+#
 # az group delete -n $rgName
