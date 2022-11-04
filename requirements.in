@@ -6,3 +6,4 @@ Flask-WTF
 pyodbc
 python-dotenv
 rich
+msal
