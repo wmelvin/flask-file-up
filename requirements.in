@@ -1,6 +1,7 @@
 Flask
-Flask-Login
+# Flask-Login
 Flask-Migrate
+Flask-Session
 Flask-SQLAlchemy
 Flask-WTF
 pyodbc

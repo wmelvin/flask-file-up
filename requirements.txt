@@ -6,6 +6,8 @@
 #
 alembic==1.8.1
     # via flask-migrate
+cachelib==0.9.0
+    # via flask-session
 certifi==2022.9.24
     # via requests
 cffi==1.15.1
@@ -23,13 +25,13 @@ cryptography==38.0.3
 flask==2.2.2
     # via
     #   -r requirements.in
-    #   flask-login
     #   flask-migrate
+    #   flask-session
     #   flask-sqlalchemy
     #   flask-wtf
-flask-login==0.6.2
-    # via -r requirements.in
 flask-migrate==3.1.0
+    # via -r requirements.in
+flask-session==0.4.0
     # via -r requirements.in
 flask-sqlalchemy==3.0.2
     # via
@@ -86,9 +88,7 @@ typing-extensions==4.4.0
 urllib3==1.26.12
     # via requests
 werkzeug==2.2.2
-    # via
-    #   flask
-    #   flask-login
+    # via flask
 wtforms==3.0.1
     # via flask-wtf
 zipp==3.10.0

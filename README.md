@@ -84,13 +84,26 @@ Installed the *ODBC Driver 18 for SQL Server* version:
 ```bash
     sudo apt install msodbcsql18
 ```
-Note: The Linux containers used to host Azure Webapps have `msodbcsql18` installed. 
+Note: The Linux containers used to host Azure Webapps have `msodbcsql18` installed.
 
 ---
 
 [Quickstart: Deploy a Python (Django or Flask) web app to Azure](https://learn.microsoft.com/en-us/azure/app-service/quickstart-python?tabs=flask%2Cmac-linux%2Cazure-cli%2Czip-deploy%2Cdeploy-instructions-azcli%2Cterminal-bash%2Cdeploy-instructions-zip-azcli#3---deploy-your-application-code-to-azure) -  Microsoft Learn
 
 [az webapp deploy](https://learn.microsoft.com/en-us/cli/azure/webapp?view=azure-cli-latest#az-webapp-deploy) - Microsoft Learn
+
+---
+
+[AzureAD/microsoft-authentication-library-for-python](https://github.com/AzureAD/microsoft-authentication-library-for-python) - GitHub
+> Microsoft Authentication Library (MSAL) for Python makes it easy to authenticate to Azure Active Directory. These documented APIs are stable https://msal-python.readthedocs.io. If you have questions but do not have a github account, ask your questions on Stackoverflow with tag &quot;msal&quot; + &quot;python&quot;.
+
+ Wiki: [AzureAD/microsoft-authentication-library-for-python](https://github.com/AzureAD/microsoft-authentication-library-for-python/wiki) - GitHub
+
+[Microsoft identity platform overview](https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-overview) - Microsoft Entra -  Microsoft Learn
+
+[Flask-Session](https://pypi.org/project/Flask-Session/) - PyPI
+
+[Quickstart: Sign in users in web apps using the auth code flow](https://learn.microsoft.com/en-us/azure/active-directory/develop/web-app-quickstart?pivots=devlang-python) - Microsoft Entra - Microsoft Learn
 
 
 ## Notes
