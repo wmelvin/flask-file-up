@@ -120,22 +120,25 @@ def inject_current_user():
 
 
 def get_current_user():
+
+    # TODO: Remove debug-print.
+    rprint("get_current_user:")
+    rprint(session)
+
     _current_user = getattr(g, "_current_user", None)
     if _current_user is None:
-
-        rprint("get_current_user:")
-        rprint(session)
-
         user_id = session.get("user_id")
         if user_id:
             user = User.query.filter_by(id=user_id).first()
             if user:
                 _current_user = g._current_user = user
-        # user_claims = session.get("user_claims")
-        # if user_claims:
-        #     g._current_user_claims = user_claims
+                #  Also store user in Flask's g variable for quick access (no
+                #  database call) when get_current_user is called multiple
+                #  times in the same session.
+
     if _current_user is None:
         _current_user = User()
+
     return _current_user
 
 
