@@ -6,7 +6,11 @@
 
     <h1>Sign In</h1>
     <form method="post" action="" novalidate>
+    
+        {# *!* Are one, or both, of these needed? #}
         {{ form.hidden_tag() }}
+        {{ form.csrf_token }}
+
         <p>
             {{ form.username.label }}<br>
             {{ form.username(size=32) }}<br>

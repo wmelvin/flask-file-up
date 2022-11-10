@@ -1,7 +1,5 @@
 from datetime import datetime
-# from app import db, login_mgr
 from app import db
-# from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -10,13 +8,13 @@ class Org(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     org_name = db.Column(db.String(64), nullable=False, unique=True)
+    org_tenant_id = db.Column(db.String, nullable=True, unique=True)
     when_added = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
     def __repr__(self) -> str:
         return f"<Org {self.id}: '{self.org_name}'>"
 
 
-# class User(UserMixin, db.Model):
 class User(db.Model):
     __tablename__ = "users"
 
@@ -41,15 +39,13 @@ class User(db.Model):
     def check_password(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
 
+    @property
+    def is_anonymous(self):
+        return not bool(self.username)
 
-# @login_mgr.user_loader
-# def load_user(id):
-#     user = User.query.get(int(id))
-
-#     # DEBUG
-#     print(f"load_user: user = {user}")
-
-#     return user
+    @property
+    def is_authenticated(self):
+        return bool(self.username)
 
 
 class Purpose(db.Model):

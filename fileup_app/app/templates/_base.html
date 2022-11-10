@@ -18,6 +18,7 @@
 
     <nav>
         <a href="/">Home</a>
+
         {% if current_user.is_anonymous %}
         <a href="/login">Sign In</a>
         {% else %}
@@ -42,9 +43,9 @@
     {% block main_content %}{% endblock main_content %}
     </div>
 
-    {# <div class="debug-div">
+    <div class="debug-div">
         <p>current_user: {{ current_user }}</p>
-    </div> #}
+    </div>
 
     {% block add_js %}{% endblock %}
 </div>

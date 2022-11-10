@@ -8,45 +8,27 @@ from flask import (
     render_template,
     url_for,
 )
-# from flask_login import current_user, login_user, logout_user, login_required
+
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 
+from app import db
+from app.main import bp
 from app.main.forms import LoginForm, UploadForm
 from app.models import Purpose, User, Org, UploadedFile
-from app.main import bp
-from app import db
-
-# TODO: *!*
-print(Org())
-user = None
-org = None
-
-
-class fake_user():
-    def __init__(self):
-        self.is_anonymous = True
-
-
-# TODO: *!*
-current_user = fake_user()
+from app.auth.routes import current_user, login_user
 
 
 @bp.route("/")
 @bp.route("/index")
 def index():
-    return render_template("index.html", current_user=current_user)
+    return render_template("index.html")
 
 
-@bp.route("/login", methods=["GET", "POST"])
+@bp.route("/login_1", methods=["GET", "POST"])
 def login():
-    # TODO: *!* New login required.
-    flash("Login not implemented.")
-    return redirect(url_for("main.index"))
-
-    # TODO: *!*
-    # if current_user.is_authenticated:
-    #     return redirect(url_for("main.index"))
+    if current_user.is_authenticated:
+        return redirect(url_for("main.index"))
 
     form = LoginForm()
 
@@ -57,8 +39,7 @@ def login():
             flash("Invalid user name or password.")
             return redirect(url_for("main.login"))
 
-        # TODO: *!*
-        # login_user(user, remember=form.remember_me.data)
+        login_user(user, remember=form.remember_me.data)
 
         next_page = request.args.get("next")
         if not next_page or url_parse(next_page).netloc != "":
@@ -69,19 +50,12 @@ def login():
     return render_template("login.html", form=form)
 
 
-@bp.route("/logout")
-def logout():
-    # TODO: *!* New logout.
-    # logout_user()
-    return redirect(url_for("main.index"))
-
-
 @bp.route("/upload")
 # @login_required
 def upload():
-    # TODO: *!* New login required.
-    flash("Login not implemented.")
-    return redirect(url_for("main.index"))
+    # # TODO: *!* New @login_required.
+    # flash("Login not implemented.")
+    # return redirect(url_for("main.index"))
 
     # Get list of tuples to use in radio button input.
     purposes = [(p.title, p.title) for p in Purpose.query.all()]
@@ -108,21 +82,16 @@ def upload():
 
 
 @bp.route("/upload", methods=["POST"])
-# @login_required
+# TODO: @login_required
 def upload_files():
-    # TODO: *!* New login required.
-    flash("Login not implemented.")
-    return redirect(url_for("main.index"))
-
     upload_url = "main.upload"
     up_files = request.files.getlist("file")
     if (not up_files) or (len(up_files[0].filename) == 0):
         flash("No file(s) selected.")
         return redirect(url_for(upload_url))
 
-    # TODO: *!*
-    # user: User = current_user
-    # org: Org = Org.query.get(user.org_id)
+    user: User = current_user
+    org: Org = Org.query.get(user.org_id)
 
     if "purpose" in request.form:
         purpose_input = request.form["purpose"]
