@@ -1,5 +1,42 @@
 {% extends "_base.html" %}
 
+{% block title_text %}Login - File Upload Site{% endblock %}
+
+{% block main_content %}
+
+    <h1>Sign In</h1>
+    <form method="post" action="" novalidate>
+    
+        {# *!* Are one, or both, of these needed? #}
+        {{ form.hidden_tag() }}
+        {{ form.csrf_token }}
+
+        <p>
+            {{ form.username.label }}<br>
+            {{ form.username(size=32) }}<br>
+            {% for err in form.username.errors %}
+            <span class="errmsg"> ({{ err }})</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(size=32) }}<br>
+            {% for err in form.password.errors %}
+            <span class="errmsg"> ({{ err }})</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+        <p>{{ form.submit }}
+        or <a href='{{ auth_url }}'>Sign In</a> with Azure Active Directory account
+        </p>
+        
+    </form>
+
+{% endblock %}
+
+
+{# {% extends "_base.html" %}
+
 {% block title_text %}Sign-In{% endblock %}
 
 {% block main_content %}
@@ -8,4 +45,4 @@
     
     <p><a href='{{ auth_url }}'>Sign In</a></p>
 
-{% endblock %}
+{% endblock %} #}
