@@ -2,7 +2,7 @@ import uuid
 
 import msal
 from app import db
-from app.auth.forms import LoginForm
+from app.auth.forms import LoginForm, LoginFormMsal
 from app.models import User
 from flask import (
     Blueprint,
@@ -22,6 +22,8 @@ from rich import print as rprint
 from werkzeug.local import LocalProxy
 from werkzeug.urls import url_parse
 from functools import wraps
+
+# TODO: Remove, or comment out, rprint statements used for debugging.
 
 
 MAX_AGE_SEC = 60 * 60 * 24 * 90  # Set cookie max_age in seconds to 90 days.
@@ -43,31 +45,28 @@ def login_required(f):
     return _login_required
 
 
-# @bp.route("/login")
-# def login():
+def get_response_to_remember(user: User):
+    """
+    Sets a 'remember' user_token for the User and returns a response that
+    sets 'remember_token' and 'user_id' cookies in the browser.
+    """
+    token = user.get_remember_token()
+    db.session.commit()  # Commit the UserToken added in get_remember_token.
 
-#     # rprint(current_app, id(current_app))
-#     # rprint(session)
-#     # for k, v in current_app.config.items():
-#     #     if k.startswith("MSAL_"):
-#     #         rprint(f"{k}='{v}'")
-
-#     session["state"] = str(uuid.uuid4())
-
-#     scopes = current_app.config["MSAL_SCOPE"]
-
-#     auth_url = _build_auth_url(
-#         scopes=scopes, state=session["state"]
-#     )
-
-#     rprint(auth_url)
-
-#     return render_template("login.html", auth_url=auth_url)
+    response = make_response(redirect(url_for("main.index")))
+    response.set_cookie(
+        "remember_token", encrypt_cookie(token), max_age=MAX_AGE_SEC
+    )
+    response.set_cookie(
+        "user_id", encrypt_cookie(user.id), max_age=MAX_AGE_SEC
+    )
+    return response
 
 
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
+        flash("Already signed in.")
         return redirect(url_for("main.index"))
 
     form = LoginForm()
@@ -81,18 +80,7 @@ def login():
 
         login_user(user)
         if form.remember_me.data:
-            response = make_response(redirect(url_for("main.index")))
-            token = user.get_remember_token()
-            # Commit the UserToken added in get_remember_token.
-            db.session.commit()
-
-            response.set_cookie(
-                "remember_token", encrypt_cookie(token), max_age=MAX_AGE_SEC
-            )
-            response.set_cookie(
-                "user_id", encrypt_cookie(user.id), max_age=MAX_AGE_SEC
-            )
-            return response
+            return get_response_to_remember(user)
 
         next_page = request.args.get("next")
         if not next_page or url_parse(next_page).netloc != "":
@@ -100,10 +88,85 @@ def login():
 
         return redirect(next_page)
 
-    session["state"] = str(uuid.uuid4())
-    scopes = current_app.config["MSAL_SCOPE"]
-    auth_url = _build_auth_url(scopes=scopes, state=session["state"])
-    return render_template("login.html", form=form, auth_url=auth_url)
+    return render_template(
+        "login.html", form=form, login2_url=url_for("auth.login2")
+    )
+
+
+@bp.route("/login2", methods=["GET", "POST"])
+def login2():
+    #  Route to sign in with Azure Active Directory.
+    if current_user.is_authenticated:
+        flash("Already signed in.")
+        return redirect(url_for("main.index"))
+
+    form = LoginFormMsal()
+
+    if form.validate_on_submit():  # Always returns False for GET request.
+        scopes = current_app.config["MSAL_SCOPE"]
+
+        #  The 'state' value is returned in the response to the redirect URI.
+        #  Encode the remember-me setting in the first character.
+        if form.remember_me.data:
+            session["state"] = f"1{str(uuid.uuid4())}"
+        else:
+            session["state"] = f"0{str(uuid.uuid4())}"
+
+        auth_url = _build_auth_url(scopes=scopes, state=session["state"])
+
+        rprint(auth_url)
+
+        return redirect(auth_url)
+
+    return render_template("login2.html", form=form)
+
+
+@bp.route("/signin-oidc")
+def authorized():
+
+    rprint("authorized BEGIN:")
+    rprint(session)
+
+    s = session.get("state")
+    if request.args.get("state") != s:
+        return redirect(url_for("index"))
+
+    #  The 'remember-me' choice is encoded in the first character of the
+    #  'state' value.
+    do_remember = s and str(s).startswith("1")
+
+    if "error" in request.args:
+        return render_template("auth_error.html", result=request.args)
+
+    if request.args.get("code"):
+        cache = _load_cache()
+        result = _build_msal_app(
+            cache=cache
+        ).acquire_token_by_authorization_code(
+            request.args["code"],
+            scopes=current_app.config["MSAL_SCOPE"],
+            redirect_uri=url_for("auth.authorized", _external=True),
+        )
+        if "error" in result:
+            return render_template("auth_error.html", result=result)
+
+        user_claims = result.get("id_token_claims")
+
+        email = user_claims.get("preferred_username")
+        if email:
+            user = User.query.filter_by(email=email).first()
+            if user:
+                login_user(user)
+
+        _save_cache(cache)
+
+        rprint("authorized END:")
+        rprint(session)
+
+        if user and do_remember:
+            return get_response_to_remember(user)
+
+    return redirect(url_for("main.index"))
 
 
 @bp.route("/logout")
@@ -142,46 +205,6 @@ def logout2():
     return redirect(uri)
 
 
-@bp.route("/signin-oidc")
-def authorized():
-
-    rprint("authorized BEGIN:")
-    rprint(session)
-
-    if request.args.get("state") != session.get("state"):
-        return redirect(url_for("index"))
-
-    if "error" in request.args:
-        return render_template("auth_error.html", result=request.args)
-
-    if request.args.get("code"):
-        cache = _load_cache()
-        result = _build_msal_app(
-            cache=cache
-        ).acquire_token_by_authorization_code(
-            request.args["code"],
-            scopes=current_app.config["MSAL_SCOPE"],
-            redirect_uri=url_for("auth.authorized", _external=True),
-        )
-        if "error" in result:
-            return render_template("auth_error.html", result=result)
-
-        user_claims = result.get("id_token_claims")
-
-        email = user_claims.get("preferred_username")
-        if email:
-            user = User.query.filter_by(email=email).first()
-            if user:
-                login_user(user)
-
-        _save_cache(cache)
-
-        rprint("authorized END:")
-        rprint(session)
-
-    return redirect(url_for("main.index"))
-
-
 def login_user(user):
     session["user_id"] = user.id
 
@@ -198,8 +221,6 @@ def inject_current_user():
 
 
 def get_current_user():
-
-    # TODO: Remove debug-print.
     rprint("get_current_user:")
     rprint(session)
 
@@ -213,6 +234,7 @@ def get_current_user():
                 #  Also store user in Flask's g variable for quick access (no
                 #  database call) when get_current_user is called multiple
                 #  times in the same session.
+                rprint("get_current_user: loaded per session.user_id")
         else:
             enc_cookie = request.cookies.get("user_id")
             if enc_cookie:
@@ -225,9 +247,14 @@ def get_current_user():
                     if user.check_remember_token(token):
                         login_user(user)
                         _current_user = g._current_user = user
+                        rprint("get_current_user: loaded per remember token")
 
         if _current_user is None:
             _current_user = User()
+            rprint("get_current_user: default empty")
+
+    else:
+        rprint("get_current_user: loaded per g var")
 
     return _current_user
 
@@ -270,7 +297,9 @@ def _build_auth_url(authority=None, scopes=None, state=None):
 
 # TODO: Implement MSAL cache some other way. It will not fit in a cookie.
 
+
 def _load_cache():
+    rprint(session)
     cache = msal.SerializableTokenCache()
     # if session.get("token_cache"):
     #     cache.deserialize(session["token_cache"])
@@ -280,4 +309,5 @@ def _load_cache():
 def _save_cache(cache):
     # if cache.has_state_changed:
     #     session["token_cache"] = cache.serialize()
-    pass
+    rprint(session)
+    return
