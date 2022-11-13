@@ -170,6 +170,7 @@ def authorized():
 
 
 @bp.route("/logout")
+@login_required
 def logout():
     #  Logout step 1.
 
@@ -193,8 +194,10 @@ def logout():
 
 
 @bp.route("/logout2")
+@login_required
 def logout2():
-    #  Logout step 2.
+    #  Logout step 2. At this point, the user should still be logged in
+    #  since step 1 only deletes the 'remember' user token and cookies.
     logout_user()
     session.clear()
 
