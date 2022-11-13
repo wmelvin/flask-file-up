@@ -18,12 +18,9 @@ from flask import (
     url_for,
 )
 from itsdangerous.url_safe import URLSafeSerializer
-from rich import print as rprint
 from werkzeug.local import LocalProxy
 from werkzeug.urls import url_parse
 from functools import wraps
-
-# TODO: Remove, or comment out, rprint statements used for debugging.
 
 
 MAX_AGE_SEC = 60 * 60 * 24 * 90  # Set cookie max_age in seconds to 90 days.
@@ -114,8 +111,6 @@ def login2():
 
         auth_url = _build_auth_url(scopes=scopes, state=session["state"])
 
-        rprint(auth_url)
-
         return redirect(auth_url)
 
     return render_template("login2.html", form=form)
@@ -123,10 +118,6 @@ def login2():
 
 @bp.route("/signin-oidc")
 def authorized():
-
-    rprint("authorized BEGIN:")
-    rprint(session)
-
     s = session.get("state")
     if request.args.get("state") != s:
         return redirect(url_for("index"))
@@ -159,9 +150,6 @@ def authorized():
                 login_user(user)
 
         _save_cache(cache)
-
-        rprint("authorized END:")
-        rprint(session)
 
         if user and do_remember:
             return get_response_to_remember(user)
@@ -224,20 +212,16 @@ def inject_current_user():
 
 
 def get_current_user():
-    rprint("get_current_user:")
-    rprint(session)
-
     _current_user = getattr(g, "_current_user", None)
     if _current_user is None:
         user_id = session.get("user_id")
         if user_id:
             user = User.query.filter_by(id=user_id).first()
             if user:
-                _current_user = g._current_user = user
                 #  Also store user in Flask's g variable for quick access (no
                 #  database call) when get_current_user is called multiple
                 #  times in the same session.
-                rprint("get_current_user: loaded per session.user_id")
+                _current_user = g._current_user = user
         else:
             enc_cookie = request.cookies.get("user_id")
             if enc_cookie:
@@ -250,14 +234,9 @@ def get_current_user():
                     if user.check_remember_token(token):
                         login_user(user)
                         _current_user = g._current_user = user
-                        rprint("get_current_user: loaded per remember token")
 
         if _current_user is None:
             _current_user = User()
-            rprint("get_current_user: default empty")
-
-    else:
-        rprint("get_current_user: loaded per g var")
 
     return _current_user
 
@@ -302,7 +281,6 @@ def _build_auth_url(authority=None, scopes=None, state=None):
 
 
 def _load_cache():
-    rprint(session)
     cache = msal.SerializableTokenCache()
     # if session.get("token_cache"):
     #     cache.deserialize(session["token_cache"])
@@ -312,5 +290,4 @@ def _load_cache():
 def _save_cache(cache):
     # if cache.has_state_changed:
     #     session["token_cache"] = cache.serialize()
-    rprint(session)
     return

@@ -8,6 +8,8 @@ from seed_db import seed_db  # noqa E402
 
 app = create_app()
 
+# print(f"*** {app.debug=}")
+
 # with app.app_context():
 #     seed_db()
 
