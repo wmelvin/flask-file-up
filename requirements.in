@@ -1,7 +1,6 @@
+azure-storage-blob
 Flask
-# Flask-Login
 Flask-Migrate
-# Flask-Session
 Flask-SQLAlchemy
 Flask-WTF
 pyodbc

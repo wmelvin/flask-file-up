@@ -47,3 +47,7 @@ class Config(object):
 
     MSAL_SCOPE = [os.environ.get("FILEUP_MSAL_SCOPE")]
     #  SCOPE needs to be a list.
+
+    # -- Configuration for Azure Storage.
+
+    STORAGE_CONNECTION = [os.environ.get("FILEUP_STORAGE_CONNECTION")]
