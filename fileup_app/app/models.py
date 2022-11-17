@@ -73,11 +73,16 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     when_added = db.Column(db.DateTime, nullable=False, default=datetime.now)
     active = db.Column(db.Boolean, default=False)
+
     user_tokens = db.relationship(
         "UserToken",
         backref="user",
         lazy="dynamic",
         cascade="all, delete-orphan",
+    )
+
+    uploaded_files = db.relationship(
+        "UploadedFile", backref="user", lazy="dynamic"
     )
 
     def __repr__(self) -> str:
@@ -152,6 +157,7 @@ class UploadedFile(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     file_name = db.Column(db.String(255), nullable=False)
+    file_status = db.Column(db.Integer, nullable=False, default=0)
     org_id = db.Column(db.Integer, db.ForeignKey("orgs.id"), nullable=False)
     org_name = db.Column(db.String(64), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)

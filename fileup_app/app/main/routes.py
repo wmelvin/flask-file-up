@@ -30,14 +30,21 @@ def upload():
     # Get list of tuples to use in radio button input.
     purposes = [(p.title, p.title) for p in Purpose.query.all()]
 
-    # Get list of files already uploaded.
-    #
-    # # TODO: Change this to use the db to get files for
-    # current user that are uploaded but not processed.
-    #
-    files = sorted(os.listdir(current_app.config["UPLOAD_PATH"]))
+    #  Get a list of files already uploaded:
+    #    Use the database to list uploaded files where the file_status
+    #    is 0 (default). This assumes the file_status on the database
+    #    record will be changed to some non-zero value after a file
+    #    is processed (whatever that process is), unless the record
+    #    is simply deleted.
+    #  TODO: This can probably be moved to the User model as
+    #          User.get_uploaded_files() -> List[str]:
+    files = []
+    ufiles = current_user.uploaded_files.filter_by(file_status=0)
+    for ufile in ufiles:
+        files.append(ufile.file_name)
+    files.sort()
 
-    # Get list of accepted file extensions.
+    #  Get list of accepted file extensions.
     ext_list = current_app.config["UPLOAD_EXTENSIONS"]
     if ext_list:
         accept = ",".join(ext_list)
