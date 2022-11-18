@@ -19,8 +19,10 @@ def create_app(config_class=Config):
 
     from app.auth.routes import bp as auth_bp
     from app.main import bp as main_bp
+    from app.storage.routes import bp as storage_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
+    app.register_blueprint(storage_bp)
 
     upload_path = app.config["UPLOAD_PATH"]
     if upload_path:

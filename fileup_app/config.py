@@ -50,4 +50,4 @@ class Config(object):
 
     # -- Configuration for Azure Storage.
 
-    STORAGE_CONNECTION = [os.environ.get("FILEUP_STORAGE_CONNECTION")]
+    STORAGE_CONNECTION = os.environ.get("FILEUP_STORAGE_CONNECTION")
