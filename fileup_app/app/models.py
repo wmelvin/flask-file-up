@@ -1,5 +1,6 @@
 from datetime import datetime
 from secrets import token_urlsafe
+from typing import List
 
 from app import db
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -134,6 +135,24 @@ class User(db.Model):
             token_type=token_type
         ).first()
         return user_token.token_raw
+
+    def get_uploaded_file_list(self) -> List[str]:
+        """
+        Returns a list of file names for files uploaded by the user that
+        have not been processsed (file_status = 0).
+
+        Use the database to list uploaded files where the file_status
+        is 0 (default). This assumes the file_status on the database
+        record will be changed to some non-zero value after a file
+        is processed (whatever that process is), unless the record
+        is simply deleted.
+        """
+        return sorted(
+            [
+                row.file_name
+                for row in self.uploaded_files.filter_by(file_status=0)
+            ]
+        )
 
 
 class Purpose(db.Model):

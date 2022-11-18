@@ -1,21 +1,19 @@
 import os
 
+from app import db
+from app.auth.routes import current_user, login_required
+from app.main import bp
+from app.main.forms import UploadForm
+from app.models import Org, Purpose, UploadedFile, User
 from flask import (
     current_app,
-    request,
     flash,
     redirect,
     render_template,
+    request,
     url_for,
 )
-
 from werkzeug.utils import secure_filename
-
-from app import db
-from app.main import bp
-from app.main.forms import UploadForm
-from app.models import Purpose, User, Org, UploadedFile
-from app.auth.routes import current_user, login_required
 
 
 @bp.route("/")
@@ -30,19 +28,7 @@ def upload():
     # Get list of tuples to use in radio button input.
     purposes = [(p.title, p.title) for p in Purpose.query.all()]
 
-    #  Get a list of files already uploaded:
-    #    Use the database to list uploaded files where the file_status
-    #    is 0 (default). This assumes the file_status on the database
-    #    record will be changed to some non-zero value after a file
-    #    is processed (whatever that process is), unless the record
-    #    is simply deleted.
-    #  TODO: This can probably be moved to the User model as
-    #          User.get_uploaded_files() -> List[str]:
-    files = []
-    ufiles = current_user.uploaded_files.filter_by(file_status=0)
-    for ufile in ufiles:
-        files.append(ufile.file_name)
-    files.sort()
+    files = current_user.get_uploaded_file_list()
 
     #  Get list of accepted file extensions.
     ext_list = current_app.config["UPLOAD_EXTENSIONS"]
