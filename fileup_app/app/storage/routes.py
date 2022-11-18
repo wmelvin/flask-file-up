@@ -6,6 +6,7 @@ from rich import print as rprint
 
 from flask import Blueprint, current_app, flash, redirect, url_for
 
+from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient, ContainerClient, BlobClient
 
 # from azure.core.exceptions import ResourceExistsError
@@ -18,11 +19,26 @@ bp = Blueprint("storage", __name__, template_folder="templates")
 
 @bp.route("/checkstorage", methods=["GET"])
 def check_storage():
+    if "CheckStorage" not in current_app.config["ENABLE_FEATURES"]:
+        return redirect(url_for("main.index"))
+
     try:
-        conn_str = current_app.config["STORAGE_CONNECTION"]
-        service_client: BlobServiceClient = (
-            BlobServiceClient.from_connection_string(conn_str)
-        )
+        acct_url = current_app.config["STORAGE_ACCOUNT_URL"]
+        if acct_url:
+            default_cred = DefaultAzureCredential()
+            service_client: BlobServiceClient = BlobServiceClient(
+                acct_url, credential=default_cred
+            )
+        else:
+            conn_str = current_app.config["STORAGE_CONNECTION"]
+            if not conn_str:
+                flash("check_storage: Not configured to access storage.")
+                return redirect(url_for("main.index"))
+
+            service_client: BlobServiceClient = (
+                BlobServiceClient.from_connection_string(conn_str)
+            )
+
         container_name = "fileup"
 
         container_client: ContainerClient = (

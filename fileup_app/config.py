@@ -17,6 +17,8 @@ class Config(object):
     SECRET_KEY = os.environ.get("FILEUP_SECRET_KEY") or "this-secret-key-SUCKS"
     # TODO: Make sure the 'or' case does not make it to prod.
 
+    ENABLE_FEATURES = os.environ.get("FILEUP_ENABLE_FEATURES", "")
+
     #  -- Configuration for database.
 
     SQLALCHEMY_DATABASE_URI = (
@@ -50,4 +52,5 @@ class Config(object):
 
     # -- Configuration for Azure Storage.
 
+    STORAGE_ACCOUNT_URL = os.environ.get("FILEUP_STORAGE_ACCOUNT_URL")
     STORAGE_CONNECTION = os.environ.get("FILEUP_STORAGE_CONNECTION")
