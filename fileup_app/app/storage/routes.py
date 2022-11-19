@@ -42,11 +42,18 @@ def store_uploaded_file(
         current_app.config["STORAGE_ACCOUNT_URL"]
         or current_app.config["STORAGE_CONNECTION"]
     ):
+        storage_name = (
+            f"AzureContainer:{current_app.config['STORAGE_CONTAINER']}"
+        )
+        # TODO: Perhaps storage_name should hold the blob URL for the uploaded
+        #  file, depenging on what any downstream processing needs. The column
+        #  type might need to be larger than the current String(255).
+
         _saveToBlob(file_name, file_data)
     else:
-        file_data.save(
-            os.path.join(current_app.config["UPLOAD_PATH"], file_name)
-        )
+        upload_path = current_app.config["UPLOAD_PATH"]
+        storage_name = f"FileSystem:{upload_path}"
+        file_data.save(os.path.join(upload_path, file_name))
 
     uf: UploadedFile = UploadedFile(
         file_name,
@@ -56,6 +63,7 @@ def store_uploaded_file(
         user.username,
         purpose.id,
         purpose.tag,
+        storage_name,
     )
     db.session.add(uf)
     db.session.commit()

@@ -185,6 +185,7 @@ class UploadedFile(db.Model):
         db.Integer, db.ForeignKey("purposes.id"), nullable=False
     )
     purpose_tag = db.Column(db.String(12), nullable=False)
+    storage_name = db.Column(db.String(255), nullable=False)
     when_uploaded = db.Column(
         db.DateTime, nullable=False, default=datetime.now
     )
@@ -198,6 +199,7 @@ class UploadedFile(db.Model):
         user_name: str,
         purpose_id: int,
         purpose_tag: str,
+        storage_name: str,
     ):
         self.file_name = file_name
         self.org_id = org_id
@@ -206,6 +208,7 @@ class UploadedFile(db.Model):
         self.user_name = user_name
         self.purpose_id = purpose_id
         self.purpose_tag = purpose_tag
+        self.storage_name = storage_name
 
     def __repr__(self) -> str:
         return f"<UploadedFile {self.id}: '{self.file_name}'>"
