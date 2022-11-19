@@ -22,9 +22,26 @@ nav {
     padding: 0.3rem;
     font-size: 18px;
     color: black;
+    display: flex;
+    justify-content: space-between;
 }
 
-nav > a { margin-left: 1rem; }
+.nav-item {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+}
+
+.nav-menu {
+    display: flex;
+}
+
+.nav-user {
+    display: flex;
+}
+
+.nav-username {
+    color: darkslategray;
+}
 
 #wrapper {
     max-width: 900px;
@@ -54,7 +71,6 @@ nav > a { margin-left: 1rem; }
 .purpose-div > label { margin: 0.5rem; }
 
 .file-input {
-    /* display: inline-block; */
     margin: 0.5rem;
     padding: 0.5rem;
 }

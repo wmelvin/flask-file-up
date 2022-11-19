@@ -17,14 +17,20 @@
 <div id="wrapper">
 
     <nav>
-        <a href="/">Home</a>
-
-        {% if current_user.is_anonymous %}
-        <a href="/login">Sign In</a>
-        {% else %}
-        <a href="/upload">Upload</a>
-        <a href="/logout">Sign Out</a>
-        {% endif %}
+        <div class="nav-menu">
+            <div class="nav-item"><a href="/">Home</a></div>
+            {% if not current_user.is_anonymous %}
+            <div class="nav-item"><a href="/upload">Upload</a></div>
+            {% endif %}
+        </div>
+        <div class="nav-user">
+            {% if current_user.is_anonymous %}
+            <div class="nav-item"><a href="/login">Sign In</a></div>
+            {% else %}
+            <div class="nav-item nav-username">{{ current_user.username }}:</div>
+            <div class="nav-item"><a href="/logout">Sign Out</a></div>
+            {% endif %}
+        </div>
     </nav>
 
     {% with messages = get_flashed_messages() %}
@@ -43,9 +49,9 @@
     {% block main_content %}{% endblock main_content %}
     </div>
 
-    <div class="debug-div">
+    {# <div class="debug-div">
         <p>current_user: {{ current_user }}</p>
-    </div>
+    </div> #}
 
     {% block add_js %}{% endblock %}
 </div>
