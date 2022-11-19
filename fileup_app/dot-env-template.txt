@@ -21,7 +21,8 @@ FILEUP_MSAL_SCOPE=""
 
 
 #  Set FILEUP_STORAGE_ACCOUNT_URL to the Storage Account URL to use 
-#  the DefaultAzureCredential method.
+#  the DefaultAzureCredential method. FILEUP_STORAGE_ACCOUNT_URL 
+#  will override FILEUP_STORAGE_CONNECTION if both are set.
 
 FILEUP_STORAGE_ACCOUNT_URL=""
 
@@ -30,5 +31,8 @@ FILEUP_STORAGE_ACCOUNT_URL=""
 
 FILEUP_STORAGE_CONNECTION=""
 
-#  FILEUP_STORAGE_ACCOUNT_URL will override FILEUP_STORAGE_CONNECTION if 
-#  both are set.
+#  Set FILEUP_STORAGE_CONTAINER to the Azure Storage container name.
+#  Container names must be all lower case.
+#  If not set, the default is 'fileup'.
+
+FILEUP_STORAGE_CONTAINER=""

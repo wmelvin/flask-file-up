@@ -3,8 +3,6 @@ import tempfile
 from pathlib import Path
 
 from app import db
-from app.auth.routes import current_user, login_required
-from app.main.forms import UploadForm
 from app.models import Org, Purpose, UploadedFile, User
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobClient, BlobServiceClient, ContainerClient
@@ -13,12 +11,9 @@ from flask import (
     current_app,
     flash,
     redirect,
-    render_template,
-    request,
     url_for,
 )
 from rich import print as rprint
-from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 
 # from azure.core.exceptions import ResourceExistsError
@@ -27,8 +22,48 @@ from werkzeug.datastructures import FileStorage
 bp = Blueprint("storage", __name__, template_folder="templates")
 
 
-def saveToBlob(file_name: str, file_data: FileStorage):
+def store_uploaded_file(
+    file_name: str,
+    org: Org,
+    user: User,
+    purpose: Purpose,
+    file_data: FileStorage,
+):
+    """
+    If Azure Storage is configured, the uploaded file will be stored
+    in a blob container. Otherwise the uploaded file is written to
+    the UPLOAD_PATH on the host.
+
+    After the file is stored, a UploadedFile record is inserted in
+    the database.
+    """
+
+    if (
+        current_app.config["STORAGE_ACCOUNT_URL"]
+        or current_app.config["STORAGE_CONNECTION"]
+    ):
+        _saveToBlob(file_name, file_data)
+    else:
+        file_data.save(
+            os.path.join(current_app.config["UPLOAD_PATH"], file_name)
+        )
+
+    uf: UploadedFile = UploadedFile(
+        file_name,
+        org.id,
+        org.org_name,
+        user.id,
+        user.username,
+        purpose.id,
+        purpose.tag,
+    )
+    db.session.add(uf)
+    db.session.commit()
+
+
+def _saveToBlob(file_name: str, file_data: FileStorage):
     try:
+        #  Prefer using the DefaultAzureCredential if configured.
         acct_url = current_app.config["STORAGE_ACCOUNT_URL"]
         if acct_url:
             default_cred = DefaultAzureCredential()
@@ -45,8 +80,7 @@ def saveToBlob(file_name: str, file_data: FileStorage):
                 BlobServiceClient.from_connection_string(conn_str)
             )
 
-        container_name = "fileup"
-        # TODO: Config this.
+        container_name = current_app.config["STORAGE_CONTAINER"]
 
         container_client: ContainerClient = (
             service_client.get_container_client(container_name)
@@ -131,83 +165,3 @@ def check_storage():
 
     flash("check_storage: success")
     return redirect(url_for("main.index"))
-
-
-@bp.route("/upload2")
-@login_required
-def upload2():
-    # Get list of tuples to use in radio button input.
-    purposes = [(p.title, p.title) for p in Purpose.query.all()]
-
-    files = current_user.get_uploaded_file_list()
-
-    #  Get list of accepted file extensions.
-    ext_list = current_app.config["UPLOAD_EXTENSIONS"]
-    if ext_list:
-        accept = ",".join(ext_list)
-    else:
-        print("No UPLOAD_EXTENSIONS configured. Default to '.csv'.")
-        accept = ".csv"
-
-    form = UploadForm()
-    form.purpose.choices = purposes
-
-    return render_template(
-        "upload.html", form=form, files=files, accept=accept
-    )
-
-
-@bp.route("/upload2", methods=["POST"])
-@login_required
-def upload_files2():
-    upload_url = "storage.upload2"
-    up_files = request.files.getlist("file")
-    if (not up_files) or (len(up_files[0].filename) == 0):
-        flash("No file(s) selected.")
-        return redirect(url_for(upload_url))
-
-    user: User = current_user
-    org: Org = Org.query.get(user.org_id)
-
-    if "purpose" in request.form:
-        purpose_input = request.form["purpose"]
-    else:
-        purpose_input = ""
-    if not purpose_input:
-        flash("A 'Purpose of File' selection is required.")
-        return redirect(url_for(upload_url))
-
-    purpose: Purpose = Purpose.query.filter_by(title=purpose_input).first()
-
-    print(f"upload_files: user='{user}', org='{org}', purpose='{purpose}'")
-
-    for up_file in up_files:
-        #  up_file is type 'werkzeug.datastructures.FileStorage'
-        file_name = secure_filename(up_file.filename)
-        if file_name != "":
-            file_ext = os.path.splitext(file_name)[1]
-            if file_ext not in current_app.config["UPLOAD_EXTENSIONS"]:
-                flash(f"Invalid file type: '{file_ext}'")
-                return redirect(url_for(upload_url))
-
-            file_name = f"fileup-u{user.id}-{purpose.get_tag()}-{file_name}"
-
-            # up_file.save(
-            #     os.path.join(current_app.config["UPLOAD_PATH"], file_name)
-            # )
-
-            saveToBlob(file_name, up_file)
-
-            uf: UploadedFile = UploadedFile(
-                file_name,
-                org.id,
-                org.org_name,
-                user.id,
-                user.username,
-                purpose.id,
-                purpose.tag,
-            )
-            db.session.add(uf)
-            db.session.commit()
-
-    return redirect(url_for(upload_url))

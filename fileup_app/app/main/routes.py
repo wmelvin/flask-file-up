@@ -1,10 +1,10 @@
 import os
 
-from app import db
 from app.auth.routes import current_user, login_required
 from app.main import bp
 from app.main.forms import UploadForm
-from app.models import Org, Purpose, UploadedFile, User
+from app.models import Org, Purpose, User
+from app.storage.routes import store_uploaded_file
 from flask import (
     current_app,
     flash,
@@ -71,6 +71,7 @@ def upload_files():
     print(f"upload_files: user='{user}', org='{org}', purpose='{purpose}'")
 
     for up_file in up_files:
+        #  up_file is type 'werkzeug.datastructures.FileStorage'
         file_name = secure_filename(up_file.filename)
         if file_name != "":
             file_ext = os.path.splitext(file_name)[1]
@@ -79,21 +80,6 @@ def upload_files():
                 return redirect(url_for(upload_url))
 
             file_name = f"fileup-u{user.id}-{purpose.get_tag()}-{file_name}"
-
-            up_file.save(
-                os.path.join(current_app.config["UPLOAD_PATH"], file_name)
-            )
-
-            uf: UploadedFile = UploadedFile(
-                file_name,
-                org.id,
-                org.org_name,
-                user.id,
-                user.username,
-                purpose.id,
-                purpose.tag,
-            )
-            db.session.add(uf)
-            db.session.commit()
+            store_uploaded_file(file_name, org, user, purpose, up_file)
 
     return redirect(url_for(upload_url))

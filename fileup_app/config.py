@@ -38,7 +38,7 @@ class Config(object):
     MAX_CONTENT_LENGTH = max_upload_mb * 1024 * 1024
 
     UPLOAD_EXTENSIONS = [".csv", ".xls", ".xlsx"]
-    UPLOAD_PATH = "uploads"
+    UPLOAD_PATH = os.environ.get("FILEUP_UPLOAD_PATH") or "uploads"
 
     # -- Configuration for MSAL.
 
@@ -54,3 +54,4 @@ class Config(object):
 
     STORAGE_ACCOUNT_URL = os.environ.get("FILEUP_STORAGE_ACCOUNT_URL")
     STORAGE_CONNECTION = os.environ.get("FILEUP_STORAGE_CONNECTION")
+    STORAGE_CONTAINER = os.environ.get("FILEUP_STORAGE_CONTAINER") or "fileup"
