@@ -39,8 +39,8 @@ $keysFile = "$env:UserProfile\KeepLocal\${baseName}-settings.ps1"
 
 # -- Check that the required variables were set.
 function CheckVarSet ([string] $varName) {
-    $val = Get-Variable -Name $varName -ValueOnly -ErrorAction:Ignore
-    if (0 -eq $val.Length) {
+    
+    if (![bool](Get-Variable -Name $varName -ErrorAction:Ignore)) {
       Write-Host "ERROR: '$varName' not set in '$keysFile'."
       Exit 1
     }
@@ -50,7 +50,15 @@ CheckVarSet "sqlAdminUser"
 CheckVarSet "sqlAdminPass"
 CheckVarSet "appSecretKey"
 CheckVarSet "appMaxUploadSizeMb"
-
+CheckVarSet "AppEnableFeatures"
+CheckVarSet "AppMsalRedirectPath"
+CheckVarSet "AppMsalAuthority"
+CheckVarSet "AppMsalClientId"
+CheckVarSet "AppMsalClientSecret"
+CheckVarSet "AppMsalScope"
+CheckVarSet "AppAzureStorageAccountURL"
+CheckVarSet "AppAzureStorageConnectionString"
+CheckVarSet "AppAzureStorageContainerName"
 
 # -- Assign additional variables used in this script.
 
@@ -131,7 +139,16 @@ az webapp config appsettings set `
     --name $webAppName `
     --settings "FILEUP_SECRET_KEY=$AppSecretKey" `
     "FILEUP_MAX_UPLOAD_MB=$AppMaxUploadSizeMb" `
-    "FILEUP_DATABASE_URI=$AppDatabaseURI"
+    "FILEUP_DATABASE_URI=$AppDatabaseURI" `
+    "FILEUP_ENABLE_FEATURES=$AppEnableFeatures" `
+    "FILEUP_MSAL_REDIRECT_PATH=$AppMsalRedirectPath" `
+    "FILEUP_MSAL_AUTHORITY=$AppMsalAuthority" `
+    "FILEUP_MSAL_CLIENT_ID=$AppMsalClientId" `
+    "FILEUP_MSAL_CLIENT_SECRET=$AppMsalClientSecret" `
+    "FILEUP_MSAL_SCOPE=$AppMsalScope" `
+    "FILEUP_STORAGE_ACCOUNT_URL=$AppAzureStorageAccountURL" `
+    "FILEUP_STORAGE_CONNECTION=$AppAzureStorageConnectionString" `
+    "FILEUP_STORAGE_CONTAINER=$AppAzureStorageContainerName"
 
 
 # -- Create SQL Server.

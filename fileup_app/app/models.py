@@ -123,18 +123,22 @@ class User(db.Model):
     def delete_remember_tokens(self):
         self.user_tokens.filter_by(token_type="remember").delete()
 
-    def save_raw_token(self, token_type, token):
-        #  Allow only one raw token of a given type.
-        self.user_tokens.filter_by(token_type=token_type).delete()
-        user_token = UserToken(self.id, token_type, token=token)
-        db.session.add(user_token)
-
-    def get_raw_token(self, token_type):
-        #  A user should have only one raw token of a given type.
-        user_token: UserToken = self.user_tokens.filter_by(
-            token_type=token_type
-        ).first()
-        return user_token.token_raw
+    # -- TODO: These two methods are not currently used. Leaving them here for
+    #  now because this functionality may be useful if adding a different auth
+    #  flow.
+    #
+    # def save_raw_token(self, token_type, token):
+    #     #  Allow only one raw token of a given type.
+    #     self.user_tokens.filter_by(token_type=token_type).delete()
+    #     user_token = UserToken(self.id, token_type, token=token)
+    #     db.session.add(user_token)
+    #
+    # def get_raw_token(self, token_type):
+    #     #  A user should have only one raw token of a given type.
+    #     user_token: UserToken = self.user_tokens.filter_by(
+    #         token_type=token_type
+    #     ).first()
+    #     return user_token.token_raw
 
     def get_uploaded_file_list(self) -> List[str]:
         """
