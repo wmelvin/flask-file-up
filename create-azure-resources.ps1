@@ -26,39 +26,36 @@ $baseName = "fileup"
 
 # -- Get key variables from file in local encrypted folder.
 
-$keysFile = "$env:UserProfile\KeepLocal\${baseName}-settings.ps1"
+# $keysFile = "$env:UserProfile\KeepLocal\${baseName}-settings.ps1"
 
-# -- The file must set these variables:
-#  $sqlAdminUser = ""
-#  $sqlAdminPass = ""
-#  $appSecretKey = ""
-#  $appMaxUploadSizeMb = ""
+$profilePath = [Environment]::GetFolderPath([Environment+SpecialFolder]::UserProfile)
+$keysFile = [System.IO.Path]::Combine($profilePath, "KeepLocal", "${baseName}-settings.ps1")
 
-# -- Source the file to set the vars.
+
+# -- Source the file to set the $fileupSettings variable (dictionary).
 . $keysFile
 
-# -- Check that the required variables were set.
-function CheckVarSet ([string] $varName) {
-    
-    if (![bool](Get-Variable -Name $varName -ErrorAction:Ignore)) {
-      Write-Host "ERROR: '$varName' not set in '$keysFile'."
-      Exit 1
-    }
+# -- Check that required settings (dictionary keys) exist.
+function CheckKeyExists ([string] $varName) {
+
+  if (! $fileupSettings.ContainsKey($varName)) {
+    Write-Host "ERROR: '$varName' not set in '$keysFile'."
+    Exit 1
+  }
 }
 
-CheckVarSet "sqlAdminUser"
-CheckVarSet "sqlAdminPass"
-CheckVarSet "appSecretKey"
-CheckVarSet "appMaxUploadSizeMb"
-CheckVarSet "AppEnableFeatures"
-CheckVarSet "AppMsalRedirectPath"
-CheckVarSet "AppMsalAuthority"
-CheckVarSet "AppMsalClientId"
-CheckVarSet "AppMsalClientSecret"
-CheckVarSet "AppMsalScope"
-CheckVarSet "AppAzureStorageAccountURL"
-CheckVarSet "AppAzureStorageConnectionString"
-CheckVarSet "AppAzureStorageContainerName"
+CheckKeyExists "FILEUP_SECRET_KEY"
+CheckKeyExists "FILEUP_MAX_UPLOAD_MB"
+CheckKeyExists "FILEUP_DATABASE_URI"
+CheckKeyExists "FILEUP_ENABLE_FEATURES"
+CheckKeyExists "FILEUP_MSAL_REDIRECT_PATH"
+CheckKeyExists "FILEUP_MSAL_AUTHORITY"
+CheckKeyExists "FILEUP_MSAL_CLIENT_ID"
+CheckKeyExists "FILEUP_MSAL_CLIENT_SECRET"
+CheckKeyExists "FILEUP_MSAL_SCOPE"
+CheckKeyExists "FILEUP_STORAGE_ACCOUNT_URL"
+CheckKeyExists "FILEUP_STORAGE_CONNECTION"
+CheckKeyExists "FILEUP_STORAGE_CONTAINER"
 
 # -- Assign additional variables used in this script.
 
@@ -134,21 +131,36 @@ az webapp config appsettings set `
 
 Write-Host "`nSTEP - Configuring web app settings for: $webAppName`n"
 
+#  Build a settings string from the key=value pairs in the 
+#  $fileupSettings dictionary loaded from $keysFile.
+
+$settings = ""
+foreach ($key in $fileupSettings.Keys) {
+  $value = $fileupSettings[$key]
+  $settings += ('"' + $key + '=' + $value + '" ')
+}
+
 az webapp config appsettings set `
     -g $rgName `
     --name $webAppName `
-    --settings "FILEUP_SECRET_KEY=$AppSecretKey" `
-    "FILEUP_MAX_UPLOAD_MB=$AppMaxUploadSizeMb" `
-    "FILEUP_DATABASE_URI=$AppDatabaseURI" `
-    "FILEUP_ENABLE_FEATURES=$AppEnableFeatures" `
-    "FILEUP_MSAL_REDIRECT_PATH=$AppMsalRedirectPath" `
-    "FILEUP_MSAL_AUTHORITY=$AppMsalAuthority" `
-    "FILEUP_MSAL_CLIENT_ID=$AppMsalClientId" `
-    "FILEUP_MSAL_CLIENT_SECRET=$AppMsalClientSecret" `
-    "FILEUP_MSAL_SCOPE=$AppMsalScope" `
-    "FILEUP_STORAGE_ACCOUNT_URL=$AppAzureStorageAccountURL" `
-    "FILEUP_STORAGE_CONNECTION=$AppAzureStorageConnectionString" `
-    "FILEUP_STORAGE_CONTAINER=$AppAzureStorageContainerName"
+    --settings $settings
+
+
+# az webapp config appsettings set `
+#     -g $rgName `
+#     --name $webAppName `
+#     --settings "FILEUP_SECRET_KEY=$AppSecretKey" `
+#     "FILEUP_MAX_UPLOAD_MB=$AppMaxUploadSizeMb" `
+#     "FILEUP_DATABASE_URI=$AppDatabaseURI" `
+#     "FILEUP_ENABLE_FEATURES=$AppEnableFeatures" `
+#     "FILEUP_MSAL_REDIRECT_PATH=$AppMsalRedirectPath" `
+#     "FILEUP_MSAL_AUTHORITY=$AppMsalAuthority" `
+#     "FILEUP_MSAL_CLIENT_ID=$AppMsalClientId" `
+#     "FILEUP_MSAL_CLIENT_SECRET=$AppMsalClientSecret" `
+#     "FILEUP_MSAL_SCOPE=$AppMsalScope" `
+#     "FILEUP_STORAGE_ACCOUNT_URL=$AppAzureStorageAccountURL" `
+#     "FILEUP_STORAGE_CONNECTION=$AppAzureStorageConnectionString" `
+#     "FILEUP_STORAGE_CONTAINER=$AppAzureStorageContainerName"
 
 
 # -- Create SQL Server.
