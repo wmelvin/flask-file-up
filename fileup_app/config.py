@@ -37,8 +37,7 @@ class Config(object):
         max_upload_mb = 2
     MAX_CONTENT_LENGTH = max_upload_mb * 1024 * 1024
 
-    # TODO: restore> UPLOAD_EXTENSIONS = [".csv", ".xls", ".xlsx"]
-    UPLOAD_EXTENSIONS = [".csv", ".xls", ".xlsx", ".mp3"]
+    UPLOAD_ACCEPT = os.environ.get("FILEUP_UPLOAD_ACCEPT") or ".csv,.xls,.xlsx"
     UPLOAD_PATH = os.environ.get("FILEUP_UPLOAD_PATH") or "uploads"
 
     # -- Configuration for MSAL.

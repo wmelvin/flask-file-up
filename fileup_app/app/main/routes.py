@@ -31,11 +31,12 @@ def upload():
     files = current_user.get_uploaded_file_list()
 
     #  Get list of accepted file extensions.
-    ext_list = current_app.config["UPLOAD_EXTENSIONS"]
-    if ext_list:
-        accept = ",".join(ext_list)
+    upload_accept = current_app.config["UPLOAD_ACCEPT"]
+    if upload_accept:
+        assert isinstance(upload_accept, str)  # TODO: remove after live test.
+        accept = upload_accept
     else:
-        print("No UPLOAD_EXTENSIONS configured. Default to '.csv'.")
+        print("No UPLOAD_ACCEPT configured. Default to '.csv'.")
         accept = ".csv"
 
     form = UploadForm()
@@ -75,7 +76,12 @@ def upload_files():
         file_name = secure_filename(up_file.filename)
         if file_name != "":
             file_ext = os.path.splitext(file_name)[1]
-            if file_ext not in current_app.config["UPLOAD_EXTENSIONS"]:
+
+            #  The UPLOAD_ACCEPT setting is a string of comma-separated file
+            #  extensions. Split it into a list for exact extension check.
+            #
+            upload_accept = str(current_app.config["UPLOAD_ACCEPT"]).split(",")
+            if file_ext not in upload_accept:
                 flash(f"Invalid file type: '{file_ext}'")
                 return redirect(url_for(upload_url))
 

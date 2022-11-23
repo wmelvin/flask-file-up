@@ -3,6 +3,7 @@ $sqlAdminPass = ""
 $fileupSettings = @{
     'FILEUP_SECRET_KEY'          = '';
     'FILEUP_ENABLE_FEATURES'     = '';
+    'FILEUP_UPLOAD_ACCEPT'       = '.csv,.xls,.xlsx'
     'FILEUP_MAX_UPLOAD_MB'       = '';
     'FILEUP_MSAL_REDIRECT_PATH'  = '';
     'FILEUP_MSAL_AUTHORITY'      = '';
