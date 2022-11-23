@@ -35,6 +35,19 @@ $keysFile = [System.IO.Path]::Combine($profilePath, "KeepLocal", "${baseName}-se
 # -- Source the file to set the $fileupSettings variable (dictionary).
 . $keysFile
 
+# -- Check that the required variables were set.
+function CheckVarSet ([string] $varName) {
+    
+  if (![bool](Get-Variable -Name $varName -ErrorAction:Ignore)) {
+    Write-Host "ERROR: '$varName' not set in '$keysFile'."
+    Exit 1
+  }
+}
+
+CheckVarSet "fileupSettings"
+CheckVarSet "sqlAdminUser"
+CheckVarSet "sqlAdminPass"
+
 # -- Check that required settings (dictionary keys) exist.
 function CheckKeyExists ([string] $varName) {
 
@@ -46,7 +59,6 @@ function CheckKeyExists ([string] $varName) {
 
 CheckKeyExists "FILEUP_SECRET_KEY"
 CheckKeyExists "FILEUP_MAX_UPLOAD_MB"
-CheckKeyExists "FILEUP_DATABASE_URI"
 CheckKeyExists "FILEUP_ENABLE_FEATURES"
 CheckKeyExists "FILEUP_MSAL_REDIRECT_PATH"
 CheckKeyExists "FILEUP_MSAL_AUTHORITY"
@@ -56,6 +68,7 @@ CheckKeyExists "FILEUP_MSAL_SCOPE"
 CheckKeyExists "FILEUP_STORAGE_ACCOUNT_URL"
 CheckKeyExists "FILEUP_STORAGE_CONNECTION"
 CheckKeyExists "FILEUP_STORAGE_CONTAINER"
+
 
 # -- Assign additional variables used in this script.
 
@@ -68,8 +81,24 @@ $webAppName = "${baseName}${uniqtag}webapp"
 $sqlServerName = "${baseName}${uniqtag}dbsrv"
 $sqlDatabaseName = "${baseName}${uniqtag}sqldb"
 
+#  Build a settings string, to use in 'az webapp config appsettings', using the
+#  key=value pairs in the $fileupSettings dictionary loaded from $keysFile.
+
 $escpw = [uri]::EscapeDataString($SqlAdminPass)
+
 $appDatabaseURI = "mssql+pyodbc://${sqlAdminUser}:${escpw}@${sqlServerName}.database.windows.net:1433/${sqlDatabaseName}?driver=ODBC+Driver+18+for+SQL+Server"
+
+$appSettingsStr = ('"FILEUP_DATABASE_URI=' + $appDatabaseURI + '"')
+
+foreach ($key in $fileupSettings.Keys) {
+  $value = $fileupSettings[$key]
+  if (0 -lt $value.Length) {
+    $appSettingsStr += (' "' + $key + '=' + $value + '"')
+  }
+}
+
+#  Run this to see that the string has spaces in the right places.
+# $appSettingsStr.Split(" ")
 
 
 # ======================================================================
@@ -101,7 +130,6 @@ az appservice plan create `
   --sku s1
 
 
-
 # -- Create the Web App.
 #    https://docs.microsoft.com/en-us/cli/azure/webapp?view=azure-cli-latest#az-webapp-create
 #
@@ -128,39 +156,15 @@ az webapp config appsettings set `
 
 
 # -- Configure settings for the web app. These are available to the app as environment variables.
+#    https://learn.microsoft.com/en-us/cli/azure/webapp/config/appsettings?view=azure-cli-latest
 
 Write-Host "`nSTEP - Configuring web app settings for: $webAppName`n"
 
-#  Build a settings string from the key=value pairs in the 
-#  $fileupSettings dictionary loaded from $keysFile.
+#  In order to treat the settings in $appSettingsStr as separate arguments that
+#  follow '--settings', create the az command as an expression and invoke it.
 
-$settings = ""
-foreach ($key in $fileupSettings.Keys) {
-  $value = $fileupSettings[$key]
-  $settings += ('"' + $key + '=' + $value + '" ')
-}
-
-az webapp config appsettings set `
-    -g $rgName `
-    --name $webAppName `
-    --settings $settings
-
-
-# az webapp config appsettings set `
-#     -g $rgName `
-#     --name $webAppName `
-#     --settings "FILEUP_SECRET_KEY=$AppSecretKey" `
-#     "FILEUP_MAX_UPLOAD_MB=$AppMaxUploadSizeMb" `
-#     "FILEUP_DATABASE_URI=$AppDatabaseURI" `
-#     "FILEUP_ENABLE_FEATURES=$AppEnableFeatures" `
-#     "FILEUP_MSAL_REDIRECT_PATH=$AppMsalRedirectPath" `
-#     "FILEUP_MSAL_AUTHORITY=$AppMsalAuthority" `
-#     "FILEUP_MSAL_CLIENT_ID=$AppMsalClientId" `
-#     "FILEUP_MSAL_CLIENT_SECRET=$AppMsalClientSecret" `
-#     "FILEUP_MSAL_SCOPE=$AppMsalScope" `
-#     "FILEUP_STORAGE_ACCOUNT_URL=$AppAzureStorageAccountURL" `
-#     "FILEUP_STORAGE_CONNECTION=$AppAzureStorageConnectionString" `
-#     "FILEUP_STORAGE_CONTAINER=$AppAzureStorageContainerName"
+$expr = "az webapp config appsettings set -g $rgName --name $webAppName --settings $appSettingsStr"
+Invoke-Expression $expr
 
 
 # -- Create SQL Server.
@@ -191,14 +195,12 @@ foreach ($ip in $ipAddresses.Split(","))
 }
 
 
-
 # -- Create SQL Database.
 #    https://docs.microsoft.com/en-us/cli/azure/sql/db?view=azure-cli-latest#az-sql-db-create
 
 Write-Host "`nSTEP - Creating database: $sqlDatabaseName`n"
 
 az sql db create --name $sqlDatabaseName -g $rgName --server $sqlServerName
-
 
 
 # -- Set custom startup command for running the Flask app.
@@ -210,17 +212,8 @@ $startCmd = "gunicorn --bind=0.0.0.0 --timeout 600 --chdir fileup_app fileup:app
 az webapp config set -g $rgName --name $webAppName --startup-file $startCmd
 
 
-
 # ----------------------------------------------------------------------
 # Additional commands and information.
-
-
-# -- Zip deploy (update $zipFile value before running).
-#    https://learn.microsoft.com/en-us/cli/azure/webapp?view=azure-cli-latest#az-webapp-deploy
-#
-# $zipFile = "../deploy/fileup_20221102_01.zip"
-# az webapp deploy --name $webAppName -g $rgName --src-path $zipFile
-
 
 # -- To add the local IP to the Database Server in the Azure Portal:
 #    - Select the Resource Group.
@@ -229,6 +222,13 @@ az webapp config set -g $rgName --name $webAppName --startup-file $startCmd
 #    - Scroll to Firewall Rules.
 #    - Select 'Add your client IPv4 address'.
 #    - Click 'Save'.
+
+
+# -- Zip deploy (update $zipFile value before running).
+#    https://learn.microsoft.com/en-us/cli/azure/webapp?view=azure-cli-latest#az-webapp-deploy
+#
+# $zipFile = "../deploy/fileup_20221122_01.zip"
+# az webapp deploy --name $webAppName -g $rgName --src-path $zipFile
 
 
 # -- Get the database connection string. The Flask app does not use this.

@@ -57,7 +57,7 @@ class Org(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     org_name = db.Column(db.String(64), nullable=False, unique=True)
-    org_tenant_id = db.Column(db.String, nullable=True, unique=True)
+    org_tenant = db.Column(db.String, nullable=True, default="")
     when_added = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
     def __repr__(self) -> str:

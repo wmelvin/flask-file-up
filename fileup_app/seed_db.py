@@ -43,7 +43,7 @@ def seed_orgs(data_path: Path):
             for row in reader:
                 o: Org = Org()
                 o.org_name = row["org_name"]
-                o.org_tenant_id = row["org_tenant_id"]
+                o.org_tenant = row["org_tenant"]
                 if o.org_name:
                     db.session.add(o)
                     db.session.commit()

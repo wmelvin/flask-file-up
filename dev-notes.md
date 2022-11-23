@@ -81,3 +81,13 @@ Successfully signed in using the credentials seeded in the database.
 Successfully uploaded a file. At this point uploads are still going to a local 'uploads' folder on the web host.
 
 ---
+
+### 2022-11-22
+
+Repeated the above deployment steps. The `create-azure-resources.ps1` script has been updated to include multiple new configuration settings since the previous deployment test.
+
+This time, the `FILEUP_STORAGE_CONNECTION` and `FILEUP_STORAGE_CONTAINER` settings were used to connect to an Azure Storage Blob container for a deployed instance of another demo application called [FunciSox](https://github.com/wmelvin/funcisox).
+
+That *Azure Durable Functions* application includes a blob-triggered function. It was successfully triggered by using **fileup_app**, also running on Azure, to upload a *.mp3* file to the container.
+
+---
