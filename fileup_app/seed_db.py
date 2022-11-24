@@ -79,8 +79,12 @@ def seed_users(data_path: Path):
 
 
 def seed_db():
-    seed_data_path = Path("~/KeepLocal/fileup").expanduser().resolve()
-    # TODO: Put seed data path in env var?
+    #  Look for a './seed_data' directory deployed with the app.
+    seed_data_path = Path.cwd() / "seed_data"
+    if not (seed_data_path.exists() and seed_data_path.is_dir()):
+        #  Otherwise look for path used in development.
+        seed_data_path = Path("~/KeepLocal/fileup").expanduser().resolve()
+        # TODO: Put seed data path in env var?
 
     if not (seed_data_path.exists() and seed_data_path.is_dir()):
         print(f"seed_db: Cannot find data path '{seed_data_path}'.")

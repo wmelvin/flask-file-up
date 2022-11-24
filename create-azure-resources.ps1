@@ -24,6 +24,9 @@
 
 $baseName = "fileup"
 
+$doSQLServer = $false
+
+
 # -- Get key variables from file in local encrypted folder.
 
 # $keysFile = "$env:UserProfile\KeepLocal\${baseName}-settings.ps1"
@@ -60,6 +63,7 @@ function CheckKeyExists ([string] $varName) {
 CheckKeyExists "FILEUP_SECRET_KEY"
 CheckKeyExists "FILEUP_MAX_UPLOAD_MB"
 CheckKeyExists "FILEUP_ENABLE_FEATURES"
+CheckKeyExists "FILEUP_UPLOAD_ACCEPT"
 CheckKeyExists "FILEUP_MSAL_REDIRECT_PATH"
 CheckKeyExists "FILEUP_MSAL_AUTHORITY"
 CheckKeyExists "FILEUP_MSAL_CLIENT_ID"
@@ -84,11 +88,18 @@ $sqlDatabaseName = "${baseName}${uniqtag}sqldb"
 #  Build a settings string, to use in 'az webapp config appsettings', using the
 #  key=value pairs in the $fileupSettings dictionary loaded from $keysFile.
 
-$escpw = [uri]::EscapeDataString($SqlAdminPass)
+if ($doSQLServer) {
+  $escpw = [uri]::EscapeDataString($SqlAdminPass)
 
-$appDatabaseURI = "mssql+pyodbc://${sqlAdminUser}:${escpw}@${sqlServerName}.database.windows.net:1433/${sqlDatabaseName}?driver=ODBC+Driver+18+for+SQL+Server"
+  $appDatabaseURI = "mssql+pyodbc://${sqlAdminUser}:${escpw}@${sqlServerName}.database.windows.net:1433/${sqlDatabaseName}?driver=ODBC+Driver+18+for+SQL+Server"
+  
+  
+  $appSettingsStr = ('"FILEUP_DATABASE_URI=' + $appDatabaseURI + '"')
+}
+else {
+  $appSettingsStr = ""
+}
 
-$appSettingsStr = ('"FILEUP_DATABASE_URI=' + $appDatabaseURI + '"')
 
 foreach ($key in $fileupSettings.Keys) {
   $value = $fileupSettings[$key]
@@ -167,41 +178,42 @@ $expr = "az webapp config appsettings set -g $rgName --name $webAppName --settin
 Invoke-Expression $expr
 
 
-# -- Create SQL Server.
-#    https://docs.microsoft.com/en-us/cli/azure/sql/server?view=azure-cli-latest#az-sql-server-create
+if ($doSQLServer) {
+  # -- Create SQL Server.
+  #    https://docs.microsoft.com/en-us/cli/azure/sql/server?view=azure-cli-latest#az-sql-server-create
 
-Write-Host "`nSTEP - Creating SQL Server: $sqlServerName`n"
+  Write-Host "`nSTEP - Creating SQL Server: $sqlServerName`n"
 
-az sql server create --name $sqlServerName -g $rgName `
-  --location $location `
-  --admin-password $SqlAdminPass `
-  --admin-user $SqlAdminUser
+  az sql server create --name $sqlServerName -g $rgName `
+    --location $location `
+    --admin-password $SqlAdminPass `
+    --admin-user $SqlAdminUser
 
 
-# -- Add firewall rules for the web app's outbound IP addresses to the SQL Server.
-#    https://docs.microsoft.com/en-us/azure/app-service/overview-inbound-outbound-ips#find-outbound-ips
-#    https://docs.microsoft.com/en-us/cli/azure/sql/server/firewall-rule?view=azure-cli-latest#az-sql-server-firewall-rule-create
+  # -- Add firewall rules for the web app's outbound IP addresses to the SQL Server.
+  #    https://docs.microsoft.com/en-us/azure/app-service/overview-inbound-outbound-ips#find-outbound-ips
+  #    https://docs.microsoft.com/en-us/cli/azure/sql/server/firewall-rule?view=azure-cli-latest#az-sql-server-firewall-rule-create
 
-Write-Host "`nSTEP - Adding firewall rules for: $sqlServerName`n"
+  Write-Host "`nSTEP - Adding firewall rules for: $sqlServerName`n"
 
-$ipAddresses = az webapp show -g $rgName --name $webAppName --query outboundIpAddresses --output tsv
-$ipNum = 0
-foreach ($ip in $ipAddresses.Split(","))
-{
-  $ipNum += 1
-  $ruleName = "WebAppIP$ipNum"
-  Write-Host $ruleName $ip
-  az sql server firewall-rule create -g $rgName -s $sqlServerName -n $ruleName --start-ip-address $ip --end-ip-address $ip
+  $ipAddresses = az webapp show -g $rgName --name $webAppName --query outboundIpAddresses --output tsv
+  $ipNum = 0
+  foreach ($ip in $ipAddresses.Split(","))
+  {
+    $ipNum += 1
+    $ruleName = "WebAppIP$ipNum"
+    Write-Host $ruleName $ip
+    az sql server firewall-rule create -g $rgName -s $sqlServerName -n $ruleName --start-ip-address $ip --end-ip-address $ip
+  }
+
+
+  # -- Create SQL Database.
+  #    https://docs.microsoft.com/en-us/cli/azure/sql/db?view=azure-cli-latest#az-sql-db-create
+
+  Write-Host "`nSTEP - Creating database: $sqlDatabaseName`n"
+
+  az sql db create --name $sqlDatabaseName -g $rgName --server $sqlServerName
 }
-
-
-# -- Create SQL Database.
-#    https://docs.microsoft.com/en-us/cli/azure/sql/db?view=azure-cli-latest#az-sql-db-create
-
-Write-Host "`nSTEP - Creating database: $sqlDatabaseName`n"
-
-az sql db create --name $sqlDatabaseName -g $rgName --server $sqlServerName
-
 
 # -- Set custom startup command for running the Flask app.
 #    https://learn.microsoft.com/en-us/azure/app-service/configure-language-python#customize-startup-command
