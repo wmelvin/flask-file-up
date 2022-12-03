@@ -1,29 +1,37 @@
 body {
     font-family: sans-serif;
     padding: 1rem 4rem;
+    color: #015da6;
 }
 
 li { padding-top: 4px; }
 
 a:link, a:visited {
-    color: #00248F;
+    color: #9f60ac;
     text-decoration: none;
 }
 
 :link:hover,:visited:hover {
-    color: #B32400;
+    color: #00248F;
     text-decoration: underline;
 }
 
 nav {
-    background-color: lightgoldenrodyellow;
+    background-color: #015da6;
     border: 1px solid gray;
     border-radius: 5px;
     padding: 0.3rem;
     font-size: 18px;
-    color: black;
+    color: white;
     display: flex;
     justify-content: space-between;
+}
+
+nav a:link, nav a:visited {
+    color: white;
+}
+nav :link:hover, nav :visited:hover {
+    color: yellow;
 }
 
 .nav-item {
@@ -40,7 +48,7 @@ nav {
 }
 
 .nav-username {
-    color: darkslategray;
+    color: lightskyblue;
 }
 
 #wrapper {
