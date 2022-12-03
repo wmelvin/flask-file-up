@@ -24,7 +24,7 @@
 
 $baseName = "fileup"
 
-$doSQLServer = $false
+$doSQLServer = $true
 
 
 # -- Get key variables from file in local encrypted folder.
