@@ -239,7 +239,7 @@ az webapp config set -g $rgName --name $webAppName --startup-file $startCmd
 # -- Zip deploy (update $zipFile value before running).
 #    https://learn.microsoft.com/en-us/cli/azure/webapp?view=azure-cli-latest#az-webapp-deploy
 #
-# $zipFile = "../deploy/fileup_20221202_01.zip"
+# $zipFile = "../deploy/fileup_20230112_01.zip"
 # az webapp deploy --name $webAppName -g $rgName --src-path $zipFile
 
 
