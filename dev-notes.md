@@ -1,6 +1,6 @@
 ### 2022-11-02
 
-Ran the `create-azure-resources.ps1` script to create and configure Azure resources.
+Ran the `az-setup.ps1` script to create and configure Azure resources.
 
 In the Azure portal, added the client IP address to the firewall rules.
 
@@ -66,7 +66,7 @@ zip -r fileup_20221102_01.zip .
 
 **Deploy the ZIP file to Azure**
 
-In PowerShell terminal (`$webAppName` and `$rgName` were already set from running `create-azure-resources.ps1`):
+In PowerShell terminal (`$webAppName` and `$rgName` were already set from running `az-setup.ps1`):
 
 ```powershell
     $zipFile = "${PATH_TO_DEPLOY}/fileup_20221102_01.zip"
@@ -84,7 +84,7 @@ Successfully uploaded a file. At this point uploads are still going to a local '
 
 ### 2022-11-22
 
-Repeated the above deployment steps. The `create-azure-resources.ps1` script has been updated to include multiple new configuration settings since the previous deployment test.
+Repeated the above deployment steps. The `az-setup.ps1` script has been updated to include multiple new configuration settings since the previous deployment test.
 
 This time, the `FILEUP_STORAGE_CONNECTION` and `FILEUP_STORAGE_CONTAINER` settings were used to connect to an Azure Storage Blob container for a deployed instance of another demo application called [FunciSox](https://github.com/wmelvin/funcisox).
 
