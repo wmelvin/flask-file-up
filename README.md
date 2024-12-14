@@ -1,5 +1,11 @@
 # File Upload App using Flask
 
+---
+
+**UPDATE 2024-12-14:** This is no longer a *work-in-progress*. This experiment is done. Keeping the notes below as-is. Archiving the repository for reference.
+
+---
+
 > This is a work-in-progress demo. If it works out, a LICENSE will be added when it is done. Otherwise this repository will probably go away.
 
 <sub>Created: 2022-10-18</sub>
